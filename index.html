@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhilary Soares - O Universo Particular</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Bebas Neue, Poppins, Great Vibes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <!-- Animate On Scroll (AOS) Library for animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --neon-pink: #f472b6;
+            --dark-bg: #030303;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #e5e7eb;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Aurora effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(
+                400px circle at var(--mouse-x) var(--mouse-y),
+                rgba(244, 114, 182, 0.1),
+                transparent 80%
+            );
+        }
+
+        .font-bebas {
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .font-signature {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 8px var(--neon-pink), 0 0 20px rgba(244, 114, 182, 0.5);
+        }
+
+        .btn-primary {
+            background-color: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(244, 114, 182, 0.5);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--neon-pink);
+            color: var(--dark-bg);
+            box-shadow: 0 0 25px rgba(244, 114, 182, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .section-full {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 1.5rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: var(--neon-pink);
+            transform: translateY(-10px);
+        }
+        
+        .image-container {
+            position: relative;
+        }
+
+        /* Gradient fade effect for images */
+        .image-fade-bottom::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, var(--dark-bg) 20%, transparent 100%);
+            pointer-events: none; /* Allows clicks to go through the gradient */
+        }
+        
+        .image-container img {
+            filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.7));
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="section-full relative text-center">
+        <div class="z-10" data-aos="fade-up">
+            <h1 class="font-signature text-8xl md:text-9xl text-glow">Rhilary Soares</h1>
+            <p class="mt-2 text-xl md:text-2xl text-gray-300 font-light tracking-widest">O UNIVERSO PARTICULAR</p>
+            <a href="#welcome" class="mt-8 inline-block px-10 py-3 font-bebas text-2xl tracking-wider btn-primary rounded-lg">
+                Descubra
+            </a>
+        </div>
+    </section>
+
+    <!-- WELCOME SECTION -->
+    <section id="welcome" class="section-full relative overflow-hidden">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
+                <!-- Text Content -->
+                <div class="z-10" data-aos="fade-right">
+                    <h2 class="font-bebas text-5xl md:text-7xl leading-none">Bem-vindo ao meu <span class="text-pink-400">mundo</span>.</h2>
+                    <p class="mt-6 text-lg text-gray-300 leading-relaxed">
+                        Este não é apenas um site. É um convite. Um convite para você conhecer um lado meu que ninguém mais vê. Sem máscaras, sem filtros. Apenas a minha versão mais autêntica e ousada, criada especialmente para você.
+                    </p>
+                    <p class="mt-4 text-lg text-gray-300 leading-relaxed">
+                        Esqueça tudo o que você pensa que sabe. Aqui, a realidade é muito mais interessante.
+                    </p>
+                </div>
+                <!-- Image with Fade Effect -->
+                <div class="relative h-full flex items-center justify-center image-container image-fade-bottom" data-aos="fade-left" data-aos-delay="200">
+                    <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118874/Untitled_design_j6phyt.jpg" alt="Foto de Rhilary Soares" class="max-w-md lg:max-w-full w-full h-auto">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHAT TO EXPECT SECTION -->
+    <section id="expect" class="py-20 md:py-32">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="font-bebas text-5xl md:text-7xl mb-16" data-aos="zoom-in">O Que te Espera</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1: Exclusividade -->
+                <div class="card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="font-bebas text-3xl text-pink-400 mb-3">Exclusividade Total</h3>
+                    <p class="text-gray-400">Conteúdos que você jamais encontrará em qualquer outra rede social. Ensaios, vídeos e momentos íntimos compartilhados apenas aqui.</p>
+                </div>
+                <!-- Card 2: Conexão Direta -->
+                <div class="card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="font-bebas text-3xl text-pink-400 mb-3">Conexão Direta</h3>
+                    <p class="text-gray-400">Converse diretamente comigo. Tenha a chance de pedir conteúdos exclusivos e fazer parte do meu círculo mais próximo.</p>
+                </div>
+                <!-- Card 3: Sem Censura -->
+                <div class="card p-8 rounded-xl" data-aos="fade-up" data-aos-delay="300">
+                    <h3 class="font-bebas text-3xl text-pink-400 mb-3">Liberdade Sem Censura</h3>
+                    <p class="text-gray-400">Explore minha criatividade sem limites. Aqui, a arte e a sensualidade andam juntas, sem medo de expressar cada detalhe.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FINAL CTA SECTION -->
+    <section id="final-cta" class="section-full relative overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
+                <!-- Image with Fade Effect -->
+                <div class="relative h-full flex items-center justify-center order-last lg:order-first image-container image-fade-bottom" data-aos="fade-right" data-aos-delay="200">
+                     <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118875/Untitled_design_hfuxwf.jpg" alt="Foto de Rhilary Soares em pose" class="max-w-md lg:max-w-full w-full h-auto">
+                </div>
+                <!-- Text -->
+                <div class="text-center lg:text-left z-10" data-aos="fade-left">
+                    <h2 class="font-bebas text-6xl md:text-8xl leading-none">A porta está <span class="text-pink-400 text-glow">aberta</span>.</h2>
+                    <p class="mt-6 text-xl text-gray-300">
+                        A decisão é sua. Continue apenas na superfície ou mergulhe em uma experiência única.
+                    </p>
+                    <a href="#" target="_blank" class="mt-8 inline-block px-12 py-4 font-bebas text-3xl tracking-wider btn-primary rounded-lg">
+                        Entrar agora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-transparent py-8">
+        <div class="container mx-auto px-6 text-center text-gray-600">
+            <p>&copy; <span id="currentYear"></span> Rhilary Soares. Todos os direitos reservados.</p>
+            <p class="text-sm mt-2">Este site e seu conteúdo são destinados a maiores de 18 anos.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize Animate On Scroll library
+        AOS.init({
+            duration: 1000,
+            once: true,
+        });
+
+        // Set current year in the footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Aurora mouse effect
+        document.addEventListener('mousemove', (e) => {
+            document.body.style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.body.style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
+    </script>
+</body>
+</html>
