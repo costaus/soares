@@ -94,14 +94,25 @@
             transform: translateY(-10px);
         }
         
-        /* New image mask for a seamless fade */
-        .image-mask-fade {
-            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        .image-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Stronger fade effect */
+        .image-container::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px; /* Small overlap to avoid thin lines */
+            width: 100%;
+            height: 60%; /* Increased height */
+            background: linear-gradient(to top, var(--dark-bg) 30%, transparent 100%); /* Stronger gradient */
         }
         
         .image-container img {
             filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.7));
+            display: block; /* Ensures the container wraps the image correctly */
         }
 
     </style>
@@ -134,8 +145,10 @@
                     </p>
                 </div>
                 <!-- Image with Fade Effect -->
-                <div class="relative h-full flex items-center justify-center image-container" data-aos="fade-left" data-aos-delay="200">
-                    <img src="https://res.cloudinary.com/dblbe6yze/image/upload/v1751118875/Untitled_design_q1vjvm.png" alt="Foto de Rhilary Soares" class="max-w-md lg:max-w-full w-full h-auto image-mask-fade">
+                <div class="relative h-full flex items-center justify-center" data-aos="fade-left" data-aos-delay="200">
+                    <div class="image-container">
+                        <img src="https://res.cloudinary.com/dblbe6yze/image/upload/v1751118875/Untitled_design_q1vjvm.png" alt="Foto de Rhilary Soares" class="max-w-md lg:max-w-full w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/600x800/030303/f472b6?text=Imagem+N%C3%A3o+Encontrada';">
+                    </div>
                 </div>
             </div>
         </div>
@@ -166,23 +179,27 @@
     </section>
     
     <!-- FINAL CTA SECTION -->
-    <section id="final-cta" class="section-full relative overflow-hidden">
+    <section id="final-cta" class="py-20 md:py-32 relative text-center">
         <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
-                <!-- Image with Fade Effect -->
-                <div class="relative h-full flex items-center justify-center order-last lg:order-first image-container" data-aos="fade-right" data-aos-delay="200">
-                     <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118874/Untitled_design_ymfdsr.jpg?_s=public-apps" alt="Foto de Rhilary Soares em pose" class="max-w-md lg:max-w-full w-full h-auto image-mask-fade">
-                </div>
-                <!-- Text -->
-                <div class="text-center lg:text-left z-10" data-aos="fade-left">
-                    <h2 class="font-bebas text-6xl md:text-8xl leading-none">A porta está <span class="text-pink-400 text-glow">aberta</span>.</h2>
-                    <p class="mt-6 text-xl text-gray-300">
-                        A decisão é sua. Continue apenas na superfície ou mergulhe em uma experiência única.
-                    </p>
-                    <a href="https://privacy.com.br/checkout/rhilary_soares?fbclid=PAQ0xDSwLM58xleHRuA2FlbQIxMAABp1gI_wJJdMXX3gfWdWwrVNePw7ntINHGoBW9NoAfPbqEMyW1E6_NwgZAf7QW_aem_flKNZN-kvjQZyUhm71fNmA" target="_blank" class="mt-8 inline-block px-12 py-4 font-bebas text-3xl tracking-wider btn-primary rounded-lg">
-                        Entrar agora
-                    </a>
-                </div>
+            <!-- Text Block -->
+            <div class="max-w-3xl mx-auto" data-aos="fade-up">
+                <h2 class="font-bebas text-6xl md:text-8xl leading-none">A porta está <span class="text-pink-400 text-glow">aberta</span>.</h2>
+                <p class="mt-6 text-xl text-gray-300">
+                    A decisão é sua. Continue apenas na superfície ou mergulhe em uma experiência única.
+                </p>
+                <a href="https://privacy.com.br/checkout/rhilary_soares?fbclid=PAQ0xDSwLM58xleHRuA2FlbQIxMAABp1gI_wJJdMXX3gfWdWwrVNePw7ntINHGoBW9NoAfPbqEMyW1E6_NwgZAf7QW_aem_flKNZN-kvjQZyUhm71fNmA" target="_blank" class="mt-8 inline-block px-12 py-4 font-bebas text-3xl tracking-wider btn-primary rounded-lg">
+                    Entrar agora
+                </a>
+            </div>
+            
+            <!-- Image below the text -->
+            <div class="mt-16 md:mt-24" data-aos="fade-up" data-aos-delay="200">
+                 <div class="image-container max-w-2xl mx-auto md:translate-x-8">
+                    <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751125255/Design_sem_nome_bjelfp.jpg?_s=public-apps" 
+                          alt="Foto de Rhilary Soares em pose" 
+                          class="w-full h-auto" 
+                          onerror="this.onerror=null;this.src='https://placehold.co/600x800/030303/f472b6?text=Imagem+N%C3%A3o+Encontrada';">
+                 </div>
             </div>
         </div>
     </section>
