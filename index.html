@@ -8,10 +8,10 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Bebas Neue, Poppins, Great Vibes -->
+    <!-- Google Fonts: Bebas Neue, Poppins, Cormorant Garamond -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;700&family=Cormorant+Garamond:wght@700&display=swap" rel="stylesheet">
     
     <!-- Animate On Scroll (AOS) Library for animations -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -51,8 +51,8 @@
             font-family: 'Bebas Neue', sans-serif;
         }
 
-        .font-signature {
-            font-family: 'Great Vibes', cursive;
+        .font-serif {
+            font-family: 'Cormorant Garamond', serif;
         }
 
         .text-glow {
@@ -94,20 +94,10 @@
             transform: translateY(-10px);
         }
         
-        .image-container {
-            position: relative;
-        }
-
-        /* Gradient fade effect for images */
-        .image-fade-bottom::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 40%;
-            background: linear-gradient(to top, var(--dark-bg) 20%, transparent 100%);
-            pointer-events: none; /* Allows clicks to go through the gradient */
+        /* New image mask for a seamless fade */
+        .image-mask-fade {
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
         }
         
         .image-container img {
@@ -121,8 +111,8 @@
     <!-- HERO SECTION -->
     <section id="hero" class="section-full relative text-center">
         <div class="z-10" data-aos="fade-up">
-            <h1 class="font-signature text-8xl md:text-9xl text-glow">Rhilary Soares</h1>
-            <p class="mt-2 text-xl md:text-2xl text-gray-300 font-light tracking-widest">O UNIVERSO PARTICULAR</p>
+            <h1 class="font-serif font-bold text-8xl md:text-[10rem] leading-none text-glow">Rhilary Soares</h1>
+            <p class="mt-2 text-xl md:text-2xl text-gray-300 font-light tracking-widest uppercase">O Universo Particular</p>
             <a href="#welcome" class="mt-8 inline-block px-10 py-3 font-bebas text-2xl tracking-wider btn-primary rounded-lg">
                 Descubra
             </a>
@@ -144,8 +134,8 @@
                     </p>
                 </div>
                 <!-- Image with Fade Effect -->
-                <div class="relative h-full flex items-center justify-center image-container image-fade-bottom" data-aos="fade-left" data-aos-delay="200">
-                    <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118874/Untitled_design_j6phyt.jpg" alt="Foto de Rhilary Soares" class="max-w-md lg:max-w-full w-full h-auto">
+                <div class="relative h-full flex items-center justify-center image-container" data-aos="fade-left" data-aos-delay="200">
+                    <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118874/Untitled_design_j6phyt.jpg" alt="Foto de Rhilary Soares" class="max-w-md lg:max-w-full w-full h-auto image-mask-fade">
                 </div>
             </div>
         </div>
@@ -180,8 +170,8 @@
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
                 <!-- Image with Fade Effect -->
-                <div class="relative h-full flex items-center justify-center order-last lg:order-first image-container image-fade-bottom" data-aos="fade-right" data-aos-delay="200">
-                     <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118875/Untitled_design_hfuxwf.jpg" alt="Foto de Rhilary Soares em pose" class="max-w-md lg:max-w-full w-full h-auto">
+                <div class="relative h-full flex items-center justify-center order-last lg:order-first image-container" data-aos="fade-right" data-aos-delay="200">
+                     <img src="https://res.cloudinary.com/dblbe6yze/image/upload/fl_preserve_transparency/v1751118875/Untitled_design_hfuxwf.jpg" alt="Foto de Rhilary Soares em pose" class="max-w-md lg:max-w-full w-full h-auto image-mask-fade">
                 </div>
                 <!-- Text -->
                 <div class="text-center lg:text-left z-10" data-aos="fade-left">
