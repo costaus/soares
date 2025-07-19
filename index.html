@@ -248,6 +248,15 @@
                     authButtonsContainer.innerHTML = '';
                     if (user) {
                         console.log(`Usuário logado: ${user.email}, UID: ${user.uid}`);
+                        // Mostra o UID na tela se não estiver visível
+if (!document.getElementById("uid-debug")) {
+    const uidDiv = document.createElement("div");
+    uidDiv.id = "uid-debug";
+    uidDiv.className = "fixed bottom-4 left-4 bg-black/80 text-white text-xs p-3 rounded-lg z-[9999]";
+    uidDiv.innerText = `Seu UID: ${user.uid}`;
+    document.body.appendChild(uidDiv);
+}
+
                         if (user.uid === ADMIN_UID) {
                             adminPanel.classList.remove('hidden');
                             console.log("Acesso de administrador concedido.");
