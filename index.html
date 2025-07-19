@@ -297,6 +297,7 @@
                 function getFirebaseErrorMessage(errorCode) { switch (errorCode) { case 'auth/invalid-email': return 'Formato de e-mail inválido.'; case 'auth/user-not-found': case 'auth/wrong-password': case 'auth/invalid-credential': return 'E-mail ou senha incorretos.'; case 'auth/email-already-in-use': return 'Este e-mail já está em uso.'; case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.'; default: return 'Ocorreu um erro. Tente novamente.'; } }
 
             } catch (e) {
+            alert("Erro no site: " + e.message);
                 console.error("ERRO CRÍTICO NA INICIALIZAÇÃO DO SCRIPT:", e);
                 // Tenta exibir um erro para o usuário final
                 const title = document.getElementById('main-title');
