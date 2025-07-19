@@ -1,11 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-br" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast Influ – Aprenda a Ganhar Dinheiro com Conteúdo</title>
+    <title>Savana Eventos</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Meta Tags Essenciais para SEO -->
+    <meta name="description" content="Savana Fest em Lavras! Garanta sua pré-venda por R$ 30. Evento em 06/09 com DJ Papas, DJ Lunardi e mais.">
+    <meta name="keywords" content="Savana Eventos, Savana Fest, ingresso, pré-venda, Lavras, festa, DJ Papas, DJ Lunardi, 06 de setembro">
+    <meta name="author" content="Savana Eventos">
+
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:title" content="Savana Eventos - Pré-Venda Savana Fest">
+    <meta property="og:description" content="A melhor festa de Lavras está chegando! Pré-venda por R$ 30. Clique e garanta o seu.">
+    <meta property="og:image" content="https://iili.io/Fj0qcOJ.png">
+    <meta property="og:url" content="https://savanaeventos.com.br">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Savana Eventos - Pré-Venda Savana Fest">
+    <meta name="twitter:description" content="A melhor festa de Lavras está chegando! Pré-venda por R$ 30. Clique e garanta o seu.">
+    <meta name="twitter:image" content="https://iili.io/Fj0qcOJ.png">
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts: Poppins -->
@@ -13,390 +31,166 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- SwiperJS for Carousels -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <!-- Favicon -->
+    <link rel="icon" href="https://iili.io/FCvz5DQ.png" type="image/png">
 
     <style>
-        /* Custom styles and animations */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #0F0F0F;
-            color: #FFFFFF;
-            background-image: radial-gradient(circle at top, #1a1a1a, #0F0F0F);
-        }
-        .text-glow {
-            text-shadow: 0 0 8px rgba(145, 71, 255, 0.8), 0 0 20px rgba(145, 71, 255, 0.5);
-        }
-        .btn-primary {
-            background: linear-gradient(90deg, #9147FF 0%, #a871ff 100%);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(145, 71, 255, 0.4);
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 25px rgba(145, 71, 255, 0.6);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            border-color: rgba(145, 71, 255, 0.5);
-            box-shadow: 0 0 20px rgba(145, 71, 255, 0.2);
+        :root {
+            --cor-principal: #E711F0;
         }
         
-        /* Scroll Animations */
-        .scroll-reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Poppins', sans-serif;
+            color: #f0f0f0;
         }
-        .scroll-reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
+        
+        #particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        #content-wrapper {
+            position: relative;
+            z-index: 1;
         }
 
-        /* Floating Animation */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+        .cta-button {
+            background-color: var(--cor-principal);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(231, 17, 240, 0.4);
         }
-        .floating {
-            animation: float 6s ease-in-out infinite;
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(231, 17, 240, 0.6);
         }
-        
-        /* Accordion styles */
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+
+        .dj-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
         }
-        .accordion-button svg {
-            transition: transform 0.3s ease;
+        .dj-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            border: 2px solid var(--cor-principal);
         }
-        .accordion-button.open svg {
-            transform: rotate(180deg);
+        .surprise-card {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center text-center overflow-hidden bg-cover bg-center bg-black" style="background-image: url('https://www.fastinflu.com/wp-content/uploads/2025/06/1-DOBRA.avif');">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-        <div class="relative z-10 p-6 max-w-4xl mx-auto">
-            <div class="scroll-reveal">
-                <span class="inline-block bg-[#9147FF]/20 text-[#c1a0ff] text-sm font-semibold px-4 py-2 rounded-full mb-4 border border-[#9147FF]/50">
-                    Método Comprovado
-                </span>
-                <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight">
-                    Cansado de só consumir conteúdo? Finalmente 
-                    <span class="text-[#9147FF] text-glow">aprenda a ganhar dinheiro</span> com ele.
-                </h1>
-                <p class="mt-4 text-lg text-gray-300">Assista este vídeo até o fim e descubra como.</p>
-            </div>
+    <div id="particles-container"></div>
 
-            <!-- Video Player -->
-            <div id="video-container" class="scroll-reveal mt-10 max-w-3xl mx-auto rounded-2xl shadow-2xl shadow-[#9147FF]/20 overflow-hidden cursor-pointer">
-                <div id="video-overlay" class="relative">
-                    <img src="https://www.fastinflu.com/wp-content/uploads/2025/06/maxresdefault.avif" alt="Video Thumbnail" class="w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/1280x720/000000/ffffff?text=Video+Thumbnail';">
-                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <div class="w-20 h-20 bg-[#9147FF] rounded-full flex items-center justify-center text-white transform transition hover:scale-110">
-                            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+    <div id="content-wrapper">
+        <main>
+            <!-- Seção Hero com Banner e CTA -->
+            <section class="min-h-screen flex flex-col justify-center items-center p-4">
+                <div class="w-full max-w-4xl mx-auto">
+                    <!-- Banner da Festa -->
+                    <img src="https://iili.io/Fj0qcOJ.png" alt="Banner da Savana Fest" class="w-full h-auto rounded-lg shadow-2xl shadow-purple-500/10 mb-10">
+
+                    <!-- Seção de Compra -->
+                    <div id="ingressos" class="bg-black/50 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center">
+                        <h1 class="text-3xl md:text-4xl font-black uppercase">Garanta sua <span style="color: var(--cor-principal);">Pré-Venda</span></h1>
+                        <p class="text-gray-300 mt-2">Aproveite o valor especial do primeiro lote. É por tempo limitado!</p>
+                        <p class="text-6xl font-black text-white my-4">R$ 30<span class="text-3xl align-top">,00</span></p>
+                        <a href="#" class="cta-button inline-block text-white font-bold rounded-lg px-12 py-4 uppercase">
+                            Comprar Ingresso
+                        </a>
+                        <p class="text-lg font-semibold mt-6">🗓️ Data: 06 de Setembro</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção Line-up Compacta -->
+            <section class="py-16 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 uppercase">Line-up</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <!-- DJ Papas -->
+                        <div class="dj-card">
+                            <img src="https://iili.io/Fjlgv2a.png" alt="DJ Papas" class="dj-image">
+                            <h3 class="font-bold text-xl">DJ PAPAS</h3>
+                        </div>
+                        <!-- DJ Lunardi -->
+                        <div class="dj-card">
+                            <img src="https://iili.io/Fjlg4hN.png" alt="DJ Lunardi" class="dj-image">
+                            <h3 class="font-bold text-xl">DJ LUNARDI</h3>
+                        </div>
+                        <!-- Atração Surpresa -->
+                        <div class="dj-card surprise-card">
+                            <div class="text-center">
+                                <p class="text-4xl">?</p>
+                                <h3 class="font-bold text-xl mt-2">EM BREVE</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="video-player" class="hidden aspect-video">
-                     <iframe width="100%" height="100%" src="https://www.youtube.com/embed/5dFqmm7UZ4M?autoplay=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-            </div>
+            </section>
 
-            <div class="scroll-reveal mt-10">
-                <a href="#comprar" class="btn-primary inline-block text-white font-bold text-lg px-10 py-4 rounded-full uppercase tracking-wider">
-                    Garantir meu acesso agora!
-                </a>
-            </div>
-        </div>
-    </section>
+        </main>
 
-    <!-- Earnings Proof Section -->
-    <section class="py-20 md:py-32">
-        <div class="container mx-auto px-6 text-center">
-            <div class="scroll-reveal max-w-3xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-bold">
-                    Eu fiz mais de <span class="text-[#9147FF]">R$ 7.000 em apenas 4 dias</span> fazendo lives!
-                </h2>
-                <p class="mt-4 text-lg text-gray-400">E agora vou te ensinar o passo a passo de como fazer o mesmo.</p>
-            </div>
-            
-            <!-- Earnings Carousel -->
-            <div class="scroll-reveal mt-12">
-                <div class="swiper earnings-swiper">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/imagem-4-pagina-2.avif" alt="Print de Ganhos 1" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Print+1';"></div>
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/imagem-3-pagina-2.avif" alt="Print de Ganhos 2" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Print+2';"></div>
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/imagem-1-pagina-2.avif" alt="Print de Ganhos 3" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Print+3';"></div>
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/imagem-2-pagina-2.avif" alt="Print de Ganhos 4" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Print+4';"></div>
-                    </div>
-                    <div class="swiper-button-next text-white"></div>
-                    <div class="swiper-button-prev text-white"></div>
+        <!-- Rodapé -->
+        <footer class="bg-black/50 backdrop-blur-sm border-t border-white/10 py-12 px-4">
+            <div class="max-w-5xl mx-auto text-center">
+                <img src="https://iili.io/FCvz5DQ.png" alt="Logo Savana Eventos no Rodapé" class="h-16 mx-auto mb-6">
+                <div class="flex justify-center items-center space-x-6 sm:space-x-8 mb-8">
+                    <a href="https://instagram.com/savanalavras" target="_blank" rel="noopener noreferrer" class="group flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-300">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.08 2.525c.636-.247 1.363-.416 2.427-.465C9.53 2.013 9.884 2 12.315 2zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm5.338-9.87a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" clip-rule="evenodd" /></svg>
+                        <span>Instagram</span>
+                    </a>
+                </div>
+                <div class="text-center text-sm text-gray-500">
+                    <p>&copy; 2025 Savana Eventos. Todos os direitos reservados.</p>
+                    <p class="mt-1">CNPJ: 61.477.242/0001-65</p>
                 </div>
             </div>
+        </footer>
+    </div>
 
-            <div class="scroll-reveal mt-12 max-w-3xl mx-auto glass-card p-8 rounded-2xl">
-                <h3 class="text-2xl font-semibold">Isso não é sorte, nem golpe.</h3>
-                <p class="mt-2 text-gray-300">São resultados de estratégias que qualquer pessoa pode aplicar, mesmo começando do zero, com poucos seguidores e apenas um celular na mão.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- What You'll Learn Section -->
-    <section class="py-20 md:py-32 relative overflow-hidden">
-        <img src="https://www.fastinflu.com/wp-content/uploads/2025/06/dolar-1.avif" alt="Dolar" class="absolute top-10 left-0 w-32 md:w-64 opacity-10 floating -translate-x-1/3" onerror="this.onerror=null;this.style.display='none';">
-        <img src="https://www.fastinflu.com/wp-content/uploads/2025/06/dolar-2.avif" alt="Dolar" class="absolute bottom-10 right-0 w-48 md:w-96 opacity-10 floating" style="animation-delay: 3s; transform: translateX(33%);" onerror="this.onerror=null;this.style.display='none';">
-
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <div class="scroll-reveal">
-                <h2 class="text-3xl md:text-5xl font-bold mb-12">Eu vou te ensinar:</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="scroll-reveal glass-card p-8 rounded-2xl text-left">
-                    <h3 class="text-xl font-bold text-[#9147FF]">Como ativar a monetização</h3>
-                    <p class="mt-2 text-gray-300">Passo a passo completo para começar a receber em suas lives hoje mesmo.</p>
-                </div>
-                <div class="scroll-reveal glass-card p-8 rounded-2xl text-left" style="transition-delay: 100ms;">
-                    <h3 class="text-xl font-bold text-[#9147FF]">Conteúdo que dá dinheiro</h3>
-                    <p class="mt-2 text-gray-300">Fórmulas testadas que garantem engajamento e maximizam seus ganhos.</p>
-                </div>
-                <div class="scroll-reveal glass-card p-8 rounded-2xl text-left" style="transition-delay: 200ms;">
-                    <h3 class="text-xl font-bold text-[#9147FF]">Como atrair o público certo</h3>
-                    <p class="mt-2 text-gray-300">Aprenda a atrair seguidores que te dão presentes e apoiam seu trabalho.</p>
-                </div>
-                <div class="scroll-reveal glass-card p-8 rounded-2xl text-left" style="transition-delay: 300ms;">
-                    <h3 class="text-xl font-bold text-[#9147FF]">Força da comunidade</h3>
-                    <p class="mt-2 text-gray-300">Acesso a mais de 4 mil pessoas para crescer ainda mais rápido.</p>
-                </div>
-            </div>
-            <div class="scroll-reveal mt-16">
-                 <h3 class="text-2xl md:text-3xl font-semibold">Se eu fiz, você também pode. <br> Mas você precisa dar o primeiro passo.</h3>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-20 md:py-32">
-        <div class="container mx-auto px-6 text-center">
-            <div class="scroll-reveal max-w-3xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-bold">
-                    Eles aplicaram o método e já estão ganhando em <span class="text-[#9147FF]">DÓLAR!</span>
-                </h2>
-                <p class="mt-4 text-lg text-gray-400">Pessoas comuns que seguiram o que eu ensino e já estão recebendo direto na conta!</p>
-            </div>
-            
-            <div class="scroll-reveal mt-12">
-                <div class="swiper testimonials-swiper">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/1.avif" alt="Depoimento 1" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Depoimento+1';"></div>
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/2.avif" alt="Depoimento 2" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Depoimento+2';"></div>
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/3.avif" alt="Depoimento 3" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Depoimento+3';"></div>
-                        <div class="swiper-slide"><img src="https://www.fastinflu.com/wp-content/uploads/2025/06/4.avif" alt="Depoimento 4" class="rounded-xl mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/400x600/1c1c1c/ffffff?text=Depoimento+4';"></div>
-                    </div>
-                    <div class="swiper-button-next text-white"></div>
-                    <div class="swiper-button-prev text-white"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Community Section -->
-    <section class="py-20 md:py-32">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col lg:flex-row items-center gap-12">
-                <div class="lg:w-1/2 text-center lg:text-left">
-                    <div class="scroll-reveal">
-                        <h2 class="text-3xl md:text-4xl font-bold">Entre para a comunidade que está <span class="text-[#9147FF]">transformando vidas!</span></h2>
-                        <p class="mt-4 text-lg text-gray-300">Ao garantir sua vaga, você terá acesso imediato à nossa comunidade com mais de 4 MIL pessoas ativas. Lá dentro, você vai poder:</p>
-                    </div>
-                    <ul class="mt-8 space-y-4 text-left">
-                        <li class="scroll-reveal flex items-start gap-4 p-4 glass-card rounded-lg" style="transition-delay: 100ms;">
-                            <span class="text-[#9147FF] mt-1 font-bold">✓</span>
-                            <span><strong>Divulgar seus vídeos</strong> e sair de 0 visualizações.</span>
-                        </li>
-                        <li class="scroll-reveal flex items-start gap-4 p-4 glass-card rounded-lg" style="transition-delay: 200ms;">
-                            <span class="text-[#9147FF] mt-1 font-bold">✓</span>
-                            <span>Fazer <strong>parcerias e collabs</strong> com outros criadores.</span>
-                        </li>
-                        <li class="scroll-reveal flex items-start gap-4 p-4 glass-card rounded-lg" style="transition-delay: 300ms;">
-                            <span class="text-[#9147FF] mt-1 font-bold">✓</span>
-                            <span>Receber <strong>feedbacks</strong> e acelerar seus resultados.</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="lg:w-1/2 scroll-reveal">
-                    <img src="https://www.fastinflu.com/wp-content/uploads/2025/06/celular.svg" alt="Comunidade no celular" class="max-w-md mx-auto" onerror="this.onerror=null;this.src='https://placehold.co/548x642/0F0F0F/ffffff?text=Celular';">
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- About Zago Section -->
-    <section class="py-20 md:py-32">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col lg:flex-row-reverse items-center gap-12">
-                <div class="lg:w-1/2 text-center lg:text-left">
-                    <div class="scroll-reveal">
-                        <h2 class="text-3xl md:text-4xl font-bold">Quem é <span class="text-[#9147FF]">Zago?</span></h2>
-                        <p class="mt-4 text-lg text-gray-300">Meu nome é Zago, e eu vivo 100% da internet. Comecei como muita gente: postando vídeos, tentando entender o algoritmo, e vendo poucas visualizações. Mas com o tempo, descobri os caminhos certos, testei estratégias que funcionam de verdade e fui crescendo.</p>
-                    </div>
-                    <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                        <div class="scroll-reveal glass-card p-4 rounded-lg">
-                            <p class="text-3xl font-bold text-[#9147FF]">800k+</p>
-                            <p class="text-sm text-gray-400">Seguidores</p>
-                        </div>
-                        <div class="scroll-reveal glass-card p-4 rounded-lg" style="transition-delay: 150ms;">
-                            <p class="text-3xl font-bold text-[#9147FF]">60M+</p>
-                            <p class="text-sm text-gray-400">Views por mês</p>
-                        </div>
-                        <div class="scroll-reveal glass-card p-4 rounded-lg" style="transition-delay: 300ms;">
-                            <p class="text-3xl font-bold text-[#9147FF]">30M+</p>
-                            <p class="text-sm text-gray-400">Curtidas</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="lg:w-1/2 scroll-reveal">
-                    <img src="https://www.fastinflu.com/wp-content/uploads/2025/06/Frame-1707478427.avif" alt="Foto de Zago" class="rounded-full aspect-square object-cover max-w-sm mx-auto shadow-lg shadow-[#9147FF]/20" onerror="this.onerror=null;this.src='https://placehold.co/400x400/1c1c1c/ffffff?text=Zago';">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-20 md:py-32">
-        <div class="container mx-auto px-6 max-w-3xl">
-            <div class="scroll-reveal text-center mb-12">
-                <h2 class="text-3xl md:text-5xl font-bold">Perguntas <span class="text-[#9147FF]">Frequentes</span></h2>
-            </div>
-            <div class="space-y-4">
-                <!-- FAQ Item 1 -->
-                <div class="scroll-reveal glass-card rounded-lg">
-                    <button class="accordion-button w-full flex justify-between items-center text-left text-xl font-semibold p-6">
-                        <span>Preciso ter muitos seguidores para começar?</span>
-                        <svg class="w-6 h-6 text-[#9147FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <div class="accordion-content">
-                        <p class="text-gray-300 p-6 pt-0">Não! O método foi desenhado para funcionar para qualquer pessoa, mesmo que você esteja começando do zero. O mais importante é a estratégia, não o número de seguidores.</p>
-                    </div>
-                </div>
-                <!-- FAQ Item 2 -->
-                <div class="scroll-reveal glass-card rounded-lg">
-                    <button class="accordion-button w-full flex justify-between items-center text-left text-xl font-semibold p-6">
-                        <span>Como funciona o acesso ao curso e à comunidade?</span>
-                        <svg class="w-6 h-6 text-[#9147FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <div class="accordion-content">
-                        <p class="text-gray-300 p-6 pt-0">Após a confirmação da sua compra, você receberá um e-mail com todas as instruções para acessar a plataforma do curso e o link para entrar na nossa comunidade exclusiva de membros.</p>
-                    </div>
-                </div>
-                <!-- FAQ Item 3 -->
-                <div class="scroll-reveal glass-card rounded-lg">
-                    <button class="accordion-button w-full flex justify-between items-center text-left text-xl font-semibold p-6">
-                        <span>E se eu não gostar? Tenho garantia?</span>
-                        <svg class="w-6 h-6 text-[#9147FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <div class="accordion-content">
-                        <p class="text-gray-300 p-6 pt-0">Sim! Você tem 7 dias de garantia incondicional. Se por qualquer motivo você achar que o conteúdo não é para você, basta pedir o reembolso e devolveremos 100% do seu dinheiro, sem perguntas.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- Pricing Section -->
-    <section id="comprar" class="py-20 md:py-32 relative overflow-hidden">
-        <img src="https://www.fastinflu.com/wp-content/uploads/2025/06/dolar-3.avif" alt="Dolar" class="absolute top-1/2 left-1/2 w-96 opacity-5 floating -translate-x-1/2 -translate-y-1/2" onerror="this.onerror=null;this.style.display='none';">
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <div class="scroll-reveal max-w-2xl mx-auto glass-card p-8 md:p-12 rounded-3xl">
-                <span class="inline-block bg-green-500/20 text-green-300 text-sm font-semibold px-4 py-2 rounded-full mb-4 border border-green-500/50">
-                    Promoção por Tempo Limitado!
-                </span>
-                <p class="text-xl text-gray-400">De <span class="line-through">R$300,00</span> por apenas</p>
-                <p class="text-7xl md:text-8xl font-black my-4 text-[#9147FF] text-glow">R$84,90</p>
-                <p class="text-lg text-gray-300 mb-8">ou 12x de R$8,52</p>
-                
-                <a href="https://pay.kirvano.com/fc40bcc8-38b7-422f-a357-7a8ffef8f4b9" target="_blank" class="btn-primary w-full text-white font-bold text-xl px-10 py-5 rounded-full uppercase tracking-wider animate-pulse">
-                    Quero meu acesso com desconto!
-                </a>
-
-                <div class="mt-8 flex justify-center items-center gap-2 text-green-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>7 Dias de Garantia Incondicional</span>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="text-center py-8 border-t border-white/10">
-        <div class="container mx-auto px-6 text-gray-500 text-sm">
-            <p>&copy; 2025 Fast Influ. Todos os direitos reservados.</p>
-            <p class="mt-2">Este site não é afiliado ao Facebook ou a qualquer entidade do Facebook. Depois que você sair do Facebook, a responsabilidade não é deles e sim do nosso site.</p>
-        </div>
-    </footer>
-
-
+    <!-- Scripts JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
     <script>
-        // --- YouTube Video Player Logic ---
-        document.getElementById('video-container').addEventListener('click', () => {
-            document.getElementById('video-overlay').classList.add('hidden');
-            document.getElementById('video-player').classList.remove('hidden');
-        });
-
-        // --- SwiperJS Carousel Initialization ---
-        const swiperConfig = {
-            loop: true,
-            autoplay: { delay: 3000, disableOnInteraction: false },
-            slidesPerView: 1,
-            spaceBetween: 20,
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-            breakpoints: {
-                768: { slidesPerView: 2, spaceBetween: 30 },
-                1024: { slidesPerView: 3, spaceBetween: 40 }
-            }
-        };
-        new Swiper('.earnings-swiper', swiperConfig);
-        new Swiper('.testimonials-swiper', swiperConfig);
-
-        // --- Scroll Reveal Animation ---
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
-        
-        // --- FAQ Accordion Logic ---
-        document.querySelectorAll('.accordion-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const content = button.nextElementSibling;
-                button.classList.toggle('open');
-                if (content.style.maxHeight) {
-                    content.style.maxHeight = null;
-                    content.style.paddingTop = null;
-                } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                    content.style.paddingTop = "0"; // To avoid jump with padding
+        document.addEventListener('DOMContentLoaded', () => {
+            tsParticles.load({
+                id: "particles-container",
+                options: {
+                    background: { color: { value: 'transparent' } },
+                    fpsLimit: 60,
+                    particles: {
+                        number: { value: 80, density: { enable: true, value_area: 800 } },
+                        color: { value: "#E711F0" },
+                        shape: { type: "circle" },
+                        opacity: { value: 0.3, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.05, sync: false } },
+                        size: { value: 2, random: true },
+                        links: { enable: true, distance: 150, color: "#E711F0", opacity: 0.1, width: 1 },
+                        move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out" }
+                    },
+                    interactivity: {
+                        detect_on: "window",
+                        events: { onhover: { enable: true, mode: "grab" }, resize: true },
+                        modes: { grab: { distance: 140, links: { opacity: 0.2 } } }
+                    },
+                    detectRetina: true,
                 }
             });
         });
     </script>
-
 </body>
 </html>
