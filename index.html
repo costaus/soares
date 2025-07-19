@@ -91,13 +91,56 @@
             justify-content: center;
             height: 100%;
         }
+
+        /* Estilos para o Modal de Login */
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-container {
+            transition: transform 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
     <div id="particles-container"></div>
 
+    <!-- Modal de Autenticação -->
+    <div id="auth-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4 hidden opacity-0">
+        <div class="modal-container bg-gray-900 border border-gray-700 rounded-lg p-8 w-full max-w-md transform -translate-y-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modal-title" class="text-2xl font-bold">Login</h2>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <form id="auth-form">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                    <input type="email" id="email" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
+                    <input type="password" id="password" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
+                </div>
+                <p id="auth-error" class="text-red-500 text-sm mb-4 hidden"></p>
+                <button id="auth-submit-btn" type="submit" class="cta-button w-full text-white font-bold rounded-md py-3 uppercase">Entrar</button>
+            </form>
+            <p class="text-center text-sm text-gray-400 mt-6">
+                <span id="modal-switch-text">Não tem uma conta?</span>
+                <button id="switch-auth-mode-btn" class="font-semibold text-[var(--cor-principal)] hover:underline">Registre-se</button>
+            </p>
+        </div>
+    </div>
+
     <div id="content-wrapper">
+        <header class="py-4 px-6 bg-black/50 backdrop-blur-md sticky top-0 z-40 border-b border-gray-800">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <img src="https://iili.io/FCvz5DQ.png" alt="Logo Savana Eventos" class="h-12">
+                <div id="auth-buttons" class="flex items-center gap-4">
+                    <!-- Botões de Login/Registro ou Info do Usuário aparecerão aqui -->
+                </div>
+            </div>
+        </header>
+
         <main>
             <!-- Seção Hero com Banner e CTA -->
             <section class="min-h-screen flex flex-col justify-center items-center p-4">
@@ -143,7 +186,6 @@
                     </div>
                 </div>
             </section>
-
         </main>
 
         <!-- Rodapé -->
@@ -166,7 +208,167 @@
 
     <!-- Scripts JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
-    <script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAp9fWl0yyjuQ86i1M1-xmUlCJn67BaMXw",
+            authDomain: "savana-login.firebaseapp.com",
+            projectId: "savana-login",
+            storageBucket: "savana-login.firebasestorage.app",
+            messagingSenderId: "406943284644",
+            appId: "1:406943284644:web:b3b74b7be0611253f45531",
+            measurementId: "G-6MWL83R3DK"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- LÓGICA DE AUTENTICAÇÃO ---
+
+        const authModal = document.getElementById('auth-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const authForm = document.getElementById('auth-form');
+        const authError = document.getElementById('auth-error');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const switchAuthModeBtn = document.getElementById('switch-auth-mode-btn');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSwitchText = document.getElementById('modal-switch-text');
+        const authButtonsContainer = document.getElementById('auth-buttons');
+
+        let isLoginMode = true;
+
+        function openModal() {
+            authModal.classList.remove('hidden');
+            setTimeout(() => {
+                authModal.classList.remove('opacity-0');
+                authModal.querySelector('.modal-container').classList.remove('-translate-y-10');
+            }, 10);
+        }
+
+        function closeModal() {
+            authModal.classList.add('opacity-0');
+            authModal.querySelector('.modal-container').classList.add('-translate-y-10');
+            setTimeout(() => authModal.classList.add('hidden'), 300);
+            authError.classList.add('hidden');
+            authForm.reset();
+        }
+
+        function updateAuthUI(user) {
+            authButtonsContainer.innerHTML = ''; // Limpa os botões
+            if (user) {
+                // Usuário está logado
+                authButtonsContainer.innerHTML = `
+                    <span class="text-sm text-gray-300 hidden sm:block">Olá, ${user.email}</span>
+                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-md px-4 py-2 transition-colors">Sair</button>
+                `;
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    signOut(auth);
+                });
+            } else {
+                // Usuário está deslogado
+                authButtonsContainer.innerHTML = `
+                    <button id="login-btn" class="text-white font-bold text-sm">Login</button>
+                    <button id="register-btn" class="bg-transparent border border-[var(--cor-principal)] text-[var(--cor-principal)] hover:bg-[var(--cor-principal)] hover:text-white font-bold text-sm rounded-md px-4 py-2 transition-colors">Registrar</button>
+                `;
+                document.getElementById('login-btn').addEventListener('click', () => {
+                    isLoginMode = true;
+                    updateModalUI();
+                    openModal();
+                });
+                document.getElementById('register-btn').addEventListener('click', () => {
+                    isLoginMode = false;
+                    updateModalUI();
+                    openModal();
+                });
+            }
+        }
+
+        function updateModalUI() {
+            if (isLoginMode) {
+                modalTitle.textContent = 'Login';
+                authSubmitBtn.textContent = 'Entrar';
+                modalSwitchText.textContent = 'Não tem uma conta?';
+                switchAuthModeBtn.textContent = 'Registre-se';
+            } else {
+                modalTitle.textContent = 'Registrar';
+                authSubmitBtn.textContent = 'Criar Conta';
+                modalSwitchText.textContent = 'Já tem uma conta?';
+                switchAuthModeBtn.textContent = 'Faça Login';
+            }
+        }
+
+        // Monitora o estado da autenticação
+        onAuthStateChanged(auth, (user) => {
+            updateAuthUI(user);
+        });
+        
+        // Event Listeners do Modal
+        closeModalBtn.addEventListener('click', closeModal);
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeModal();
+        });
+
+        switchAuthModeBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            updateModalUI();
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            authError.classList.add('hidden');
+            authSubmitBtn.disabled = true;
+            authSubmitBtn.textContent = 'Processando...';
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                }
+                closeModal();
+            } catch (error) {
+                console.error("Erro de autenticação:", error.code, error.message);
+                authError.textContent = getFirebaseErrorMessage(error.code);
+                authError.classList.remove('hidden');
+            } finally {
+                authSubmitBtn.disabled = false;
+                updateModalUI();
+            }
+        });
+
+        function getFirebaseErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/invalid-email':
+                    return 'Formato de e-mail inválido.';
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential':
+                    return 'E-mail ou senha incorretos.';
+                case 'auth/email-already-in-use':
+                    return 'Este e-mail já está em uso.';
+                case 'auth/weak-password':
+                    return 'A senha deve ter pelo menos 6 caracteres.';
+                default:
+                    return 'Ocorreu um erro. Tente novamente.';
+            }
+        }
+
+        // --- LÓGICA DAS PARTÍCULAS ---
         document.addEventListener('DOMContentLoaded', () => {
             tsParticles.load({
                 id: "particles-container",
@@ -191,6 +393,7 @@
                 }
             });
         });
+
     </script>
 </body>
 </html>
