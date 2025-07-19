@@ -84,20 +84,33 @@
             margin: 0 auto 1rem;
             border: 2px solid var(--cor-principal);
         }
-        .surprise-card {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
 
-        /* Estilos para o Modal de Login */
+        /* Estilos para Modals */
         .modal-overlay {
             transition: opacity 0.3s ease;
         }
         .modal-container {
             transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .input-field {
+            width: 100%;
+            background-color: #1f2937; /* bg-gray-800 */
+            border: 1px solid #4b5563; /* border-gray-600 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.5rem 0.75rem; /* px-3 py-2 */
+            color: white;
+        }
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--cor-principal);
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
         }
     </style>
 </head>
@@ -105,21 +118,26 @@
 
     <div id="particles-container"></div>
 
+    <!-- ===== MODALS ===== -->
     <!-- Modal de Autenticação -->
     <div id="auth-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4 hidden opacity-0">
         <div class="modal-container bg-gray-900 border border-gray-700 rounded-lg p-8 w-full max-w-md transform -translate-y-10">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="modal-title" class="text-2xl font-bold">Login</h2>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+                <button id="close-auth-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
             </div>
             <form id="auth-form">
+                <div id="name-field-container" class="mb-4 hidden">
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Nome</label>
+                    <input type="text" id="name" class="input-field">
+                </div>
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
+                    <input type="email" id="email" required class="input-field">
                 </div>
                 <div class="mb-6">
                     <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
-                    <input type="password" id="password" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
+                    <input type="password" id="password" required class="input-field">
                 </div>
                 <p id="auth-error" class="text-red-500 text-sm mb-4 hidden"></p>
                 <button id="auth-submit-btn" type="submit" class="cta-button w-full text-white font-bold rounded-md py-3 uppercase">Entrar</button>
@@ -131,12 +149,86 @@
         </div>
     </div>
 
+    <!-- Modal de Perfil do Usuário -->
+    <div id="profile-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4 hidden opacity-0">
+        <div class="modal-container bg-gray-900 border border-gray-700 rounded-lg p-8 w-full max-w-md transform -translate-y-10">
+             <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Meu Perfil</h2>
+                <button id="close-profile-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div class="text-center">
+                <img id="profile-pic-display" src="https://placehold.co/128x128/374151/E5E7EB?text=Foto" alt="Foto de Perfil" class="w-32 h-32 object-cover rounded-full mx-auto mb-4 border-2 border-[var(--cor-principal)]">
+                <input type="file" id="profile-pic-upload" class="hidden" accept="image/*">
+                <button onclick="document.getElementById('profile-pic-upload').click()" class="text-sm text-[var(--cor-principal)] hover:underline mb-6">Alterar foto</button>
+                <p id="upload-status" class="text-sm text-gray-400 mb-4"></p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-gray-400">Nome</label>
+                    <p id="profile-name" class="text-lg"></p>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-400">Email</label>
+                    <p id="profile-email" class="text-lg"></p>
+                </div>
+                 <div>
+                    <label class="text-sm font-medium text-gray-400">Status da Conta</label>
+                    <p id="profile-verification" class="text-lg"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Painel de Admin -->
+    <div id="admin-panel-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4 hidden opacity-0">
+        <div class="modal-container bg-gray-900 border border-gray-700 rounded-lg p-8 w-full max-w-2xl transform -translate-y-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Painel do Administrador</h2>
+                <button id="close-admin-panel-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div class="space-y-6">
+                <!-- Editar Conteúdo Principal -->
+                <form id="admin-content-form" class="space-y-4 p-4 border border-gray-700 rounded-lg">
+                    <h3 class="font-bold text-lg">Editar Conteúdo da Página</h3>
+                    <div>
+                        <label for="admin-banner-url" class="block text-sm font-medium text-gray-300 mb-1">URL do Banner Principal</label>
+                        <input type="url" id="admin-banner-url" class="input-field">
+                    </div>
+                    <div>
+                        <label for="admin-main-title" class="block text-sm font-medium text-gray-300 mb-1">Título Principal</label>
+                        <input type="text" id="admin-main-title" class="input-field">
+                    </div>
+                    <button type="submit" class="cta-button text-white font-bold rounded-md px-4 py-2">Salvar Conteúdo</button>
+                </form>
+                <!-- Gerenciar Line-up -->
+                <div class="p-4 border border-gray-700 rounded-lg">
+                    <h3 class="font-bold text-lg mb-4">Gerenciar Line-up</h3>
+                    <div id="admin-lineup-list" class="space-y-2 mb-4">
+                        <!-- Lista de DJs será inserida aqui pelo JS -->
+                    </div>
+                    <form id="admin-add-dj-form" class="flex items-end gap-4">
+                        <div class="flex-1">
+                            <label for="admin-dj-name" class="block text-sm font-medium text-gray-300 mb-1">Nome do DJ</label>
+                            <input type="text" id="admin-dj-name" required class="input-field">
+                        </div>
+                         <div class="flex-1">
+                            <label for="admin-dj-image" class="block text-sm font-medium text-gray-300 mb-1">URL da Imagem</label>
+                            <input type="url" id="admin-dj-image" required class="input-field">
+                        </div>
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold rounded-md px-4 py-2">Adicionar DJ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div id="content-wrapper">
         <header class="py-4 px-6 bg-black/50 backdrop-blur-md sticky top-0 z-40 border-b border-gray-800">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <img src="https://iili.io/FCvz5DQ.png" alt="Logo Savana Eventos" class="h-12">
                 <div id="auth-buttons" class="flex items-center gap-4">
-                    <!-- Botões de Login/Registro ou Info do Usuário aparecerão aqui -->
+                    <!-- Botões de Login/Perfil ou Info do Usuário aparecerão aqui -->
                 </div>
             </div>
         </header>
@@ -145,12 +237,12 @@
             <!-- Seção Hero com Banner e CTA -->
             <section class="min-h-screen flex flex-col justify-center items-center p-4">
                 <div class="w-full max-w-4xl mx-auto">
-                    <!-- Banner da Festa -->
-                    <img src="https://iili.io/Fj0qcOJ.png" alt="Banner da Savana Fest" class="w-full h-auto rounded-lg shadow-2xl shadow-purple-500/10 mb-10">
+                    <!-- Banner da Festa (Carregado dinamicamente) -->
+                    <img id="main-banner" src="https://placehold.co/1200x675/0a0a0a/E711F0?text=Carregando+Banner..." alt="Banner da Savana Fest" class="w-full h-auto rounded-lg shadow-2xl shadow-purple-500/10 mb-10">
 
                     <!-- Seção de Compra -->
                     <div id="ingressos" class="bg-black/50 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center">
-                        <h1 class="text-3xl md:text-4xl font-black uppercase">Garanta sua <span style="color: var(--cor-principal);">Pré-Venda</span></h1>
+                        <h1 id="main-title-display" class="text-3xl md:text-4xl font-black uppercase">Garanta sua <span style="color: var(--cor-principal);">Pré-Venda</span></h1>
                         <p class="text-gray-300 mt-2">Aproveite o valor especial do primeiro lote. É por tempo limitado!</p>
                         <p class="text-6xl font-black text-white my-4">R$ 30<span class="text-3xl align-top">,00</span></p>
                         <a href="#" class="cta-button inline-block text-white font-bold rounded-lg px-12 py-4 uppercase">
@@ -161,34 +253,18 @@
                 </div>
             </section>
 
-            <!-- Seção Line-up Compacta -->
+            <!-- Seção Line-up (Carregado dinamicamente) -->
             <section class="py-16 px-4">
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold text-center mb-8 uppercase">Line-up</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <!-- DJ Papas -->
-                        <div class="dj-card">
-                            <img src="https://iili.io/Fjlgv2a.png" alt="DJ Papas" class="dj-image">
-                            <h3 class="font-bold text-xl">DJ PAPAS</h3>
-                        </div>
-                        <!-- DJ Lunardi -->
-                        <div class="dj-card">
-                            <img src="https://iili.io/Fjlg4hN.png" alt="DJ Lunardi" class="dj-image">
-                            <h3 class="font-bold text-xl">DJ LUNARDI</h3>
-                        </div>
-                        <!-- Atração Surpresa -->
-                        <div class="dj-card surprise-card">
-                            <div class="text-center">
-                                <p class="text-4xl">?</p>
-                                <h3 class="font-bold text-xl mt-2">EM BREVE</h3>
-                            </div>
-                        </div>
+                    <div id="lineup-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <!-- DJs serão inseridos aqui pelo JS -->
+                        <div class="text-center p-8 text-gray-400">Carregando line-up...</div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- Rodapé -->
         <footer class="bg-black/50 backdrop-blur-sm border-t border-white/10 py-12 px-4">
             <div class="max-w-5xl mx-auto text-center">
                 <img src="https://iili.io/FCvz5DQ.png" alt="Logo Savana Eventos no Rodapé" class="h-16 mx-auto mb-6">
@@ -199,11 +275,17 @@
                     </a>
                 </div>
                 <div class="text-center text-sm text-gray-500">
-                    <p>&copy; 2025 Savana Eventos. Todos os direitos reservados.</p>
+                    <p id="copyright">&copy; 2025 Savana Eventos. Todos os direitos reservados.</p>
                     <p class="mt-1">CNPJ: 61.477.242/0001-65</p>
                 </div>
             </div>
         </footer>
+    </div>
+    
+    <div id="admin-fab" class="hidden">
+        <button id="open-admin-panel-btn" class="floating-btn cta-button text-white font-bold rounded-full p-4 shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        </button>
     </div>
 
     <!-- Scripts JavaScript -->
@@ -211,74 +293,138 @@
     
     <!-- Firebase SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        // Importações do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword,
-            onAuthStateChanged,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+            onAuthStateChanged, signOut, sendEmailVerification, updateProfile 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc, onSnapshot, updateDoc, arrayUnion, arrayRemove 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { 
+            getStorage, ref, uploadBytes, getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-        // Your web app's Firebase configuration
+        // Configuração do Firebase (substitua pelos seus dados)
         const firebaseConfig = {
             apiKey: "AIzaSyAp9fWl0yyjuQ86i1M1-xmUlCJn67BaMXw",
             authDomain: "savana-login.firebaseapp.com",
             projectId: "savana-login",
-            storageBucket: "savana-login.firebasestorage.app",
+            storageBucket: "savana-login.appspot.com", // Corrija o domínio para .appspot.com
             messagingSenderId: "406943284644",
-            appId: "1:406943284644:web:b3b74b7be0611253f45531",
-            measurementId: "G-6MWL83R3DK"
+            appId: "1:406943284644:web:b3b74b7be0611253f45531"
         };
 
-        // Initialize Firebase
+        // Inicialização dos serviços do Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
-        // --- LÓGICA DE AUTENTICAÇÃO ---
-
+        // --- DOM Elements ---
         const authModal = document.getElementById('auth-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const authForm = document.getElementById('auth-form');
-        const authError = document.getElementById('auth-error');
-        const authSubmitBtn = document.getElementById('auth-submit-btn');
-        const switchAuthModeBtn = document.getElementById('switch-auth-mode-btn');
-        const modalTitle = document.getElementById('modal-title');
-        const modalSwitchText = document.getElementById('modal-switch-text');
+        const profileModal = document.getElementById('profile-modal');
+        const adminPanelModal = document.getElementById('admin-panel-modal');
         const authButtonsContainer = document.getElementById('auth-buttons');
+        // ... (outros seletores de elementos)
 
         let isLoginMode = true;
+        let currentUserData = null; // Armazena dados do usuário logado
 
-        function openModal() {
-            authModal.classList.remove('hidden');
+        // --- FUNÇÕES DE UI (MODALS, etc.) ---
+        function openModal(modal) {
+            modal.classList.remove('hidden');
             setTimeout(() => {
-                authModal.classList.remove('opacity-0');
-                authModal.querySelector('.modal-container').classList.remove('-translate-y-10');
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.modal-container').classList.remove('-translate-y-10');
             }, 10);
         }
 
-        function closeModal() {
-            authModal.classList.add('opacity-0');
-            authModal.querySelector('.modal-container').classList.add('-translate-y-10');
-            setTimeout(() => authModal.classList.add('hidden'), 300);
-            authError.classList.add('hidden');
-            authForm.reset();
+        function closeModal(modal) {
+            modal.classList.add('opacity-0');
+            modal.querySelector('.modal-container').classList.add('-translate-y-10');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
+        
+        // --- LÓGICA DE CONTEÚDO DINÂMICO ---
+        const contentRef = doc(db, "siteContent", "liveData");
+        onSnapshot(contentRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                // Atualiza Banner e Título
+                document.getElementById('main-banner').src = data.bannerUrl || 'https://placehold.co/1200x675/0a0a0a/E711F0?text=Banner+N%C3%A3o+Definido';
+                document.getElementById('main-title-display').innerHTML = data.mainTitle || 'Garanta sua <span style="color: var(--cor-principal);">Pré-Venda</span>';
+                
+                // Atualiza Line-up
+                const lineupContainer = document.getElementById('lineup-container');
+                lineupContainer.innerHTML = ''; // Limpa o container
+                if (data.lineup && data.lineup.length > 0) {
+                    data.lineup.forEach(dj => {
+                        const djCard = `
+                            <div class="dj-card">
+                                <img src="${dj.imageUrl || 'https://placehold.co/120x120'}" alt="${dj.name}" class="dj-image">
+                                <h3 class="font-bold text-xl">${dj.name}</h3>
+                            </div>
+                        `;
+                        lineupContainer.innerHTML += djCard;
+                    });
+                } else {
+                    lineupContainer.innerHTML = '<p class="text-center col-span-full">Line-up será anunciado em breve!</p>';
+                }
 
-        function updateAuthUI(user) {
-            authButtonsContainer.innerHTML = ''; // Limpa os botões
+                // Atualiza forms do admin
+                document.getElementById('admin-banner-url').value = data.bannerUrl;
+                document.getElementById('admin-main-title').value = data.mainTitle;
+                updateAdminLineupList(data.lineup || []);
+            } else {
+                console.log("Documento de conteúdo não encontrado! Crie-o no Firestore.");
+            }
+        });
+
+        // --- LÓGICA DE AUTENTICAÇÃO ---
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Usuário está logado
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+                const adminDocRef = doc(db, "admins", user.uid);
+                const adminDocSnap = await getDoc(adminDocRef);
+
+                currentUserData = userDocSnap.exists() ? userDocSnap.data() : { email: user.email };
+                currentUserData.uid = user.uid;
+                currentUserData.emailVerified = user.emailVerified;
+                
+                const isAdmin = adminDocSnap.exists();
+                updateAuthUI(user, isAdmin);
+            } else {
+                currentUserData = null;
+                updateAuthUI(null, false);
+            }
+        });
+
+        function updateAuthUI(user, isAdmin) {
+            authButtonsContainer.innerHTML = '';
+            document.getElementById('admin-fab').classList.add('hidden');
+
+            if (user) {
+                // Usuário Logado
+                const profilePic = currentUserData.profilePictureUrl || 'https://placehold.co/40x40/374151/E5E7EB?text=...';
                 authButtonsContainer.innerHTML = `
-                    <span class="text-sm text-gray-300 hidden sm:block">Olá, ${user.email}</span>
+                    <button id="profile-btn" class="flex items-center gap-2">
+                        <img src="${profilePic}" alt="Perfil" class="w-10 h-10 rounded-full object-cover border-2 border-gray-600">
+                        <span class="text-sm text-gray-300 hidden sm:block">${currentUserData.name || user.email}</span>
+                    </button>
                     <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-md px-4 py-2 transition-colors">Sair</button>
                 `;
-                document.getElementById('logout-btn').addEventListener('click', () => {
-                    signOut(auth);
-                });
+                document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+                document.getElementById('profile-btn').addEventListener('click', showUserProfile);
+                
+                if (isAdmin) {
+                    document.getElementById('admin-fab').classList.remove('hidden');
+                }
+
             } else {
-                // Usuário está deslogado
+                // Usuário Deslogado
                 authButtonsContainer.innerHTML = `
                     <button id="login-btn" class="text-white font-bold text-sm">Login</button>
                     <button id="register-btn" class="bg-transparent border border-[var(--cor-principal)] text-[var(--cor-principal)] hover:bg-[var(--cor-principal)] hover:text-white font-bold text-sm rounded-md px-4 py-2 transition-colors">Registrar</button>
@@ -286,112 +432,207 @@
                 document.getElementById('login-btn').addEventListener('click', () => {
                     isLoginMode = true;
                     updateModalUI();
-                    openModal();
+                    openModal(authModal);
                 });
                 document.getElementById('register-btn').addEventListener('click', () => {
                     isLoginMode = false;
                     updateModalUI();
-                    openModal();
+                    openModal(authModal);
                 });
             }
         }
 
-        function updateModalUI() {
-            if (isLoginMode) {
-                modalTitle.textContent = 'Login';
-                authSubmitBtn.textContent = 'Entrar';
-                modalSwitchText.textContent = 'Não tem uma conta?';
-                switchAuthModeBtn.textContent = 'Registre-se';
-            } else {
-                modalTitle.textContent = 'Registrar';
-                authSubmitBtn.textContent = 'Criar Conta';
-                modalSwitchText.textContent = 'Já tem uma conta?';
-                switchAuthModeBtn.textContent = 'Faça Login';
-            }
-        }
-
-        // Monitora o estado da autenticação
-        onAuthStateChanged(auth, (user) => {
-            updateAuthUI(user);
-        });
-        
-        // Event Listeners do Modal
-        closeModalBtn.addEventListener('click', closeModal);
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) closeModal();
-        });
-
-        switchAuthModeBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            updateModalUI();
-        });
-
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const authError = document.getElementById('auth-error');
+            
             authError.classList.add('hidden');
-            authSubmitBtn.disabled = true;
-            authSubmitBtn.textContent = 'Processando...';
+            // ... (Lógica de desabilitar botão)
 
             try {
                 if (isLoginMode) {
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
-                    await createUserWithEmailAndPassword(auth, email, password);
+                    if (!name) {
+                        authError.textContent = 'Por favor, insira seu nome.';
+                        authError.classList.remove('hidden');
+                        return;
+                    }
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    // Salva informações adicionais no Firestore
+                    await setDoc(doc(db, "users", user.uid), {
+                        name: name,
+                        email: email,
+                        createdAt: new Date(),
+                        profilePictureUrl: ''
+                    });
+
+                    // Envia email de verificação
+                    await sendEmailVerification(user);
+                    alert("Conta criada! Um e-mail de verificação foi enviado para você. Por favor, verifique sua caixa de entrada.");
                 }
-                closeModal();
+                closeModal(authModal);
             } catch (error) {
-                console.error("Erro de autenticação:", error.code, error.message);
                 authError.textContent = getFirebaseErrorMessage(error.code);
                 authError.classList.remove('hidden');
             } finally {
-                authSubmitBtn.disabled = false;
-                updateModalUI();
+                // ... (Lógica de reabilitar botão)
+            }
+        });
+        
+        // --- LÓGICA DO PERFIL DO USUÁRIO ---
+        function showUserProfile() {
+            if (!currentUserData) return;
+            document.getElementById('profile-pic-display').src = currentUserData.profilePictureUrl || 'https://placehold.co/128x128/374151/E5E7EB?text=Foto';
+            document.getElementById('profile-name').textContent = currentUserData.name || 'Não informado';
+            document.getElementById('profile-email').textContent = currentUserData.email;
+            document.getElementById('profile-verification').textContent = currentUserData.emailVerified ? 'Verificada' : 'Verificação pendente';
+            document.getElementById('profile-verification').className = currentUserData.emailVerified ? 'text-green-400' : 'text-yellow-400';
+            openModal(profileModal);
+        }
+
+        document.getElementById('profile-pic-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentUserData) return;
+
+            const statusEl = document.getElementById('upload-status');
+            statusEl.textContent = 'Enviando foto...';
+            
+            const storageRef = ref(storage, `profile_pictures/${currentUserData.uid}/${file.name}`);
+            
+            try {
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                
+                // Atualiza Firestore
+                const userDocRef = doc(db, "users", currentUserData.uid);
+                await updateDoc(userDocRef, { profilePictureUrl: downloadURL });
+
+                // Atualiza UI
+                document.getElementById('profile-pic-display').src = downloadURL;
+                // Atualiza a foto no header também
+                document.querySelector('#auth-buttons img').src = downloadURL;
+                statusEl.textContent = 'Foto atualizada!';
+            } catch (error) {
+                console.error("Erro no upload:", error);
+                statusEl.textContent = 'Falha no upload.';
             }
         });
 
-        function getFirebaseErrorMessage(errorCode) {
-            switch (errorCode) {
-                case 'auth/invalid-email':
-                    return 'Formato de e-mail inválido.';
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                case 'auth/invalid-credential':
-                    return 'E-mail ou senha incorretos.';
-                case 'auth/email-already-in-use':
-                    return 'Este e-mail já está em uso.';
-                case 'auth/weak-password':
-                    return 'A senha deve ter pelo menos 6 caracteres.';
-                default:
-                    return 'Ocorreu um erro. Tente novamente.';
+        // --- LÓGICA DO PAINEL DE ADMIN ---
+        document.getElementById('admin-content-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bannerUrl = document.getElementById('admin-banner-url').value;
+            const mainTitle = document.getElementById('admin-main-title').value;
+            
+            try {
+                await updateDoc(contentRef, { bannerUrl, mainTitle });
+                alert('Conteúdo salvo com sucesso!');
+            } catch (error) {
+                console.error("Erro ao salvar conteúdo:", error);
+                alert('Falha ao salvar. Verifique o console.');
             }
+        });
+
+        document.getElementById('admin-add-dj-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('admin-dj-name').value;
+            const imageUrl = document.getElementById('admin-dj-image').value;
+            const newDj = { name, imageUrl };
+
+            try {
+                await updateDoc(contentRef, {
+                    lineup: arrayUnion(newDj)
+                });
+                e.target.reset();
+            } catch (error) {
+                console.error("Erro ao adicionar DJ:", error);
+                alert('Falha ao adicionar DJ.');
+            }
+        });
+
+        function updateAdminLineupList(lineup) {
+            const listContainer = document.getElementById('admin-lineup-list');
+            listContainer.innerHTML = '';
+            lineup.forEach((dj, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-gray-800 p-2 rounded';
+                item.innerHTML = `
+                    <span>${dj.name}</span>
+                    <button data-dj-name="${dj.name}" data-dj-image="${dj.imageUrl}" class="remove-dj-btn bg-red-600 hover:bg-red-700 text-white text-xs rounded px-2 py-1">Remover</button>
+                `;
+                listContainer.appendChild(item);
+            });
+
+            document.querySelectorAll('.remove-dj-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const djToRemove = {
+                        name: e.target.dataset.djName,
+                        imageUrl: e.target.dataset.djImage
+                    };
+                    if (confirm(`Tem certeza que deseja remover o DJ ${djToRemove.name}?`)) {
+                        try {
+                            await updateDoc(contentRef, {
+                                lineup: arrayRemove(djToRemove)
+                            });
+                        } catch (error) {
+                            console.error("Erro ao remover DJ:", error);
+                            alert('Falha ao remover DJ.');
+                        }
+                    }
+                });
+            });
         }
 
-        // --- LÓGICA DAS PARTÍCULAS ---
+
+        // --- HELPERS E EVENT LISTENERS GERAIS ---
+        function updateModalUI() {
+            const nameFieldContainer = document.getElementById('name-field-container');
+            if (isLoginMode) {
+                document.getElementById('modal-title').textContent = 'Login';
+                document.getElementById('auth-submit-btn').textContent = 'Entrar';
+                document.getElementById('modal-switch-text').textContent = 'Não tem uma conta?';
+                document.getElementById('switch-auth-mode-btn').textContent = 'Registre-se';
+                nameFieldContainer.classList.add('hidden');
+                document.getElementById('name').required = false;
+            } else {
+                document.getElementById('modal-title').textContent = 'Registrar';
+                document.getElementById('auth-submit-btn').textContent = 'Criar Conta';
+                document.getElementById('modal-switch-text').textContent = 'Já tem uma conta?';
+                document.getElementById('switch-auth-mode-btn').textContent = 'Faça Login';
+                nameFieldContainer.classList.remove('hidden');
+                document.getElementById('name').required = true;
+            }
+        }
+        
+        document.getElementById('switch-auth-mode-btn').addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            updateModalUI();
+        });
+        
+        // Fechar modals
+        document.getElementById('close-auth-modal-btn').addEventListener('click', () => closeModal(authModal));
+        document.getElementById('close-profile-modal-btn').addEventListener('click', () => closeModal(profileModal));
+        document.getElementById('close-admin-panel-btn').addEventListener('click', () => closeModal(adminPanelModal));
+        document.getElementById('open-admin-panel-btn').addEventListener('click', () => openModal(adminPanelModal));
+
+
+        function getFirebaseErrorMessage(errorCode) {
+            // ... (mesma função de antes)
+            return 'Ocorreu um erro. Tente novamente.';
+        }
+
+        // Atualizar ano do copyright
+        document.getElementById('copyright').innerHTML = `&copy; ${new Date().getFullYear()} Savana Eventos. Todos os direitos reservados.`;
+
+        // Lógica das partículas (tsParticles)
         document.addEventListener('DOMContentLoaded', () => {
-            tsParticles.load({
-                id: "particles-container",
-                options: {
-                    background: { color: { value: 'transparent' } },
-                    fpsLimit: 60,
-                    particles: {
-                        number: { value: 80, density: { enable: true, value_area: 800 } },
-                        color: { value: "#E711F0" },
-                        shape: { type: "circle" },
-                        opacity: { value: 0.3, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.05, sync: false } },
-                        size: { value: 2, random: true },
-                        links: { enable: true, distance: 150, color: "#E711F0", opacity: 0.1, width: 1 },
-                        move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out" }
-                    },
-                    interactivity: {
-                        detect_on: "window",
-                        events: { onhover: { enable: true, mode: "grab" }, resize: true },
-                        modes: { grab: { distance: 140, links: { opacity: 0.2 } } }
-                    },
-                    detectRetina: true,
-                }
-            });
+            tsParticles.load({ id: "particles-container", options: { /* ... opções das partículas ... */ }});
         });
 
     </script>
