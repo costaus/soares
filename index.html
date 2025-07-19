@@ -99,23 +99,6 @@
         .modal-container {
             transition: transform 0.3s ease;
         }
-
-        /* Estilo para o input de foto de perfil */
-        #profile-pic-container {
-            cursor: pointer;
-        }
-        #profile-pic {
-            transition: filter 0.3s ease;
-        }
-        #profile-pic-container:hover #profile-pic {
-            filter: brightness(0.7);
-        }
-        #profile-pic-container:hover .overlay-icon {
-            opacity: 1;
-        }
-        .overlay-icon {
-            transition: opacity 0.3s ease;
-        }
     </style>
 </head>
 <body>
@@ -216,14 +199,10 @@
                 <h2 class="text-3xl font-bold text-center mb-8 uppercase">Meu Perfil</h2>
                 <form id="profile-form">
                     <div class="flex flex-col items-center mb-6">
-                        <label for="profile-pic-input" id="profile-pic-container" class="relative w-32 h-32 rounded-full border-2 border-[var(--cor-principal)] mb-4">
+                        <div class="relative w-32 h-32 rounded-full border-2 border-[var(--cor-principal)] mb-4">
                             <img id="profile-pic" src="https://placehold.co/128x128/1f2937/9ca3af?text=Foto" alt="Foto de Perfil" class="w-full h-full object-cover rounded-full">
-                            <div class="overlay-icon absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full opacity-0">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            </div>
-                        </label>
-                        <input type="file" id="profile-pic-input" class="hidden" accept="image/*">
-                        <p class="text-sm text-gray-400">Clique na imagem para alterar</p>
+                        </div>
+                        <p class="text-sm text-gray-400">Seu avatar é gerado automaticamente.</p>
                     </div>
 
                     <div class="mb-4">
@@ -279,14 +258,14 @@
             sendEmailVerification
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+        // REMOVEMOS A IMPORTAÇÃO DO STORAGE
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAp9fWl0yyjuQ86i1M1-xmUlCJn67BaMXw", // MANTENHA A SUA CHAVE
             authDomain: "savana-login.firebaseapp.com",
             projectId: "savana-login",
-            storageBucket: "savana-login.appspot.com", // VERIFIQUE SE ESTÁ CORRETO NO SEU CONSOLE
+            storageBucket: "savana-login.appspot.com",
             messagingSenderId: "406943284644",
             appId: "1:406943284644:web:b3b74b7be0611253f45531",
             measurementId: "G-6MWL83R3DK"
@@ -296,7 +275,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app); // Inicializa Firestore
-        const storage = getStorage(app); // Inicializa Storage
 
         // --- DOM Elements ---
         const authModal = document.getElementById('auth-modal');
@@ -314,7 +292,6 @@
         const mainContent = document.getElementById('main-content');
         const profileSection = document.getElementById('profile-section');
         const profileForm = document.getElementById('profile-form');
-        const profilePicInput = document.getElementById('profile-pic-input');
         const profilePicImg = document.getElementById('profile-pic');
         const profileNameInput = document.getElementById('profile-name');
         const profileEmailInput = document.getElementById('profile-email');
@@ -387,17 +364,16 @@
 
         // --- LÓGICA DE AUTENTICAÇÃO (CORE) ---
         onAuthStateChanged(auth, async (user) => {
-            currentUser = user; // Armazena o usuário atual
+            currentUser = user; 
             updateAuthUI(user);
             if (!user) {
-                showMainContent(); // Se deslogar, volta para a tela principal
+                showMainContent();
             }
         });
 
         function updateAuthUI(user) {
             authButtonsContainer.innerHTML = '';
             if (user) {
-                // Usuário está logado
                 authButtonsContainer.innerHTML = `
                     <button id="profile-btn" class="text-white font-bold text-sm hover:text-[var(--cor-principal)] transition-colors">Meu Perfil</button>
                     <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-md px-3 py-2 sm:px-4 transition-colors">Sair</button>
@@ -405,21 +381,12 @@
                 document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
                 document.getElementById('profile-btn').addEventListener('click', showProfileSection);
             } else {
-                // Usuário está deslogado
                 authButtonsContainer.innerHTML = `
                     <button id="login-btn" class="text-white font-bold text-sm hover:text-[var(--cor-principal)] transition-colors">Login</button>
                     <button id="register-btn" class="bg-transparent border border-[var(--cor-principal)] text-[var(--cor-principal)] hover:bg-[var(--cor-principal)] hover:text-white font-bold text-sm rounded-md px-3 py-2 sm:px-4 transition-colors">Registrar</button>
                 `;
-                document.getElementById('login-btn').addEventListener('click', () => {
-                    isLoginMode = true;
-                    updateModalUI();
-                    openModal();
-                });
-                document.getElementById('register-btn').addEventListener('click', () => {
-                    isLoginMode = false;
-                    updateModalUI();
-                    openModal();
-                });
+                document.getElementById('login-btn').addEventListener('click', () => { isLoginMode = true; updateModalUI(); openModal(); });
+                document.getElementById('register-btn').addEventListener('click', () => { isLoginMode = false; updateModalUI(); openModal(); });
             }
         }
 
@@ -437,22 +404,24 @@
                 if (isLoginMode) {
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
-                    // Criar usuário
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
                     
-                    // 1. Atualizar perfil no Auth (adicionar nome)
-                    await updateProfile(user, { displayName: name });
+                    // Gera a URL do avatar com as iniciais do nome
+                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E711F0&color=fff&size=128`;
+
+                    await updateProfile(user, { 
+                        displayName: name,
+                        photoURL: avatarUrl // Salva a URL do avatar no perfil do Auth
+                    });
                     
-                    // 2. Criar documento no Firestore
                     await setDoc(doc(db, "users", user.uid), {
                         uid: user.uid,
                         name: name,
                         email: user.email,
-                        photoURL: null // Começa sem foto
+                        photoURL: avatarUrl // Salva a URL também no Firestore
                     });
 
-                    // 3. Enviar e-mail de verificação
                     await sendEmailVerification(user);
                     showToast("Conta criada! Um e-mail de verificação foi enviado.");
                 }
@@ -478,15 +447,7 @@
                 const userData = docSnap.data();
                 profileNameInput.value = userData.name || '';
                 profileEmailInput.value = userData.email || '';
-                if (userData.photoURL) {
-                    profilePicImg.src = userData.photoURL;
-                } else {
-                    profilePicImg.src = `https://placehold.co/128x128/1f2937/9ca3af?text=${userData.name.charAt(0)}`;
-                }
-            } else {
-                // Fallback se o documento não existir (pouco provável)
-                profileNameInput.value = currentUser.displayName || '';
-                profileEmailInput.value = currentUser.email || '';
+                profilePicImg.src = userData.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=E711F0&color=fff&size=128`;
             }
         }
 
@@ -498,33 +459,22 @@
             saveProfileBtn.textContent = 'Salvando...';
 
             const newName = profileNameInput.value;
-            const file = profilePicInput.files[0];
-            let photoURL = currentUser.photoURL;
+            // A URL do avatar será atualizada se o nome mudar
+            const newAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=E711F0&color=fff&size=128`;
 
             try {
-                // 1. Se houver um novo arquivo de imagem, faz o upload
-                if (file) {
-                    const storageRef = ref(storage, `profile_pictures/${currentUser.uid}`);
-                    const snapshot = await uploadBytes(storageRef, file);
-                    photoURL = await getDownloadURL(snapshot.ref);
-                }
-
-                // 2. Atualiza o perfil no Firebase Auth
                 await updateProfile(currentUser, {
                     displayName: newName,
-                    photoURL: photoURL
+                    photoURL: newAvatarUrl
                 });
 
-                // 3. Atualiza o documento no Firestore
                 const userDocRef = doc(db, "users", currentUser.uid);
                 await updateDoc(userDocRef, {
                     name: newName,
-                    photoURL: photoURL
+                    photoURL: newAvatarUrl
                 });
                 
-                // Atualiza a imagem na tela imediatamente
-                if (photoURL) profilePicImg.src = photoURL;
-
+                profilePicImg.src = newAvatarUrl;
                 showToast("Perfil atualizado com sucesso!");
 
             } catch (error) {
@@ -536,28 +486,10 @@
             }
         });
 
-        // Preview da imagem ao selecionar
-        profilePicInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    profilePicImg.src = event.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-
         // --- EVENT LISTENERS GERAIS ---
         closeModalBtn.addEventListener('click', closeModal);
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) closeModal();
-        });
-        switchAuthModeBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            updateModalUI();
-        });
+        authModal.addEventListener('click', (e) => { if (e.target === authModal) closeModal(); });
+        switchAuthModeBtn.addEventListener('click', () => { isLoginMode = !isLoginMode; updateModalUI(); });
         backToMainBtn.addEventListener('click', showMainContent);
 
         function getFirebaseErrorMessage(errorCode) {
@@ -576,29 +508,7 @@
         // --- LÓGICA DAS PARTÍCULAS ---
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('year').textContent = new Date().getFullYear();
-
-            tsParticles.load({
-                id: "particles-container",
-                options: {
-                    background: { color: { value: 'transparent' } },
-                    fpsLimit: 60,
-                    particles: {
-                        number: { value: 80, density: { enable: true, value_area: 800 } },
-                        color: { value: "#E711F0" },
-                        shape: { type: "circle" },
-                        opacity: { value: 0.3, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.05, sync: false } },
-                        size: { value: 2, random: true },
-                        links: { enable: true, distance: 150, color: "#E711F0", opacity: 0.1, width: 1 },
-                        move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out" }
-                    },
-                    interactivity: {
-                        detect_on: "window",
-                        events: { onhover: { enable: true, mode: "grab" }, resize: true },
-                        modes: { grab: { distance: 140, links: { opacity: 0.2 } } }
-                    },
-                    detectRetina: true,
-                }
-            });
+            tsParticles.load({ id: "particles-container", options: { background: { color: { value: 'transparent' } }, fpsLimit: 60, particles: { number: { value: 80, density: { enable: true, value_area: 800 } }, color: { value: "#E711F0" }, shape: { type: "circle" }, opacity: { value: 0.3, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.05, sync: false } }, size: { value: 2, random: true }, links: { enable: true, distance: 150, color: "#E711F0", opacity: 0.1, width: 1 }, move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out" } }, interactivity: { detect_on: "window", events: { onhover: { enable: true, mode: "grab" }, resize: true }, modes: { grab: { distance: 140, links: { opacity: 0.2 } } } }, detectRetina: true, } });
         });
     </script>
 </body>
