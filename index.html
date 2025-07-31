@@ -350,7 +350,7 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             font-weight: 900;
-            padding-top: 20px; /* AJUSTADO: Padding para o título não ser cortado */
+            padding-top: 50px; /* AJUSTADO: Mais padding para o título não ser cortado */
         }
 
         .character-selection-container {
@@ -595,7 +595,7 @@
             .character-selection-container {
                 flex-direction: column; /* Empilha os cards verticalmente */
                 gap: 20px;
-                height: auto; /* Altura automática */
+                height: auto;
             }
             .character-card {
                 width: 100%;
@@ -639,8 +639,7 @@
                     <h3>Eduardo Vício Pinto</h3>
                 </div>
             </div>
-            <!-- Botão para iniciar o jogo após a seleção (aparece via JS) -->
-            <button id="start-game-after-character-select" class="menu-button">Iniciar Jogo</button>
+            <!-- REMOVIDO: Botão para iniciar o jogo após a seleção -->
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -688,7 +687,7 @@
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
         const characterCards = document.querySelectorAll('.character-card'); // Seleciona os cards
-        const startGameAfterCharacterSelectButton = document.getElementById('start-game-after-character-select'); // Novo botão
+        // REMOVIDO: const startGameAfterCharacterSelectButton = document.getElementById('start-game-after-character-select');
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
@@ -808,7 +807,7 @@
             startScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             audioToggleButton.style.display = 'none'; // Esconde o botão de áudio na seleção de personagem
-            startGameAfterCharacterSelectButton.style.display = 'none'; // Esconde o botão de iniciar jogo inicialmente
+            // REMOVIDO: Esconder o botão de iniciar jogo inicialmente
 
             // Atualiza as imagens dos personagens na tela de seleção
             document.querySelector('.character-card[data-character-id="carlinha"] img').src = characterData.carlinha.selectionImage;
@@ -878,7 +877,7 @@
         startButton.addEventListener('click', startCaiRolaGame);
         restartButton.addEventListener('click', startCaiRolaGame);
 
-        // Event Listeners para os CARDS de seleção de personagem
+        // Event Listeners para os CARDS de seleção de personagem (AGORA INICIAM O JOGO DIRETAMENTE)
         characterCards.forEach(card => {
             card.addEventListener('click', (event) => {
                 // Remove a classe 'selected' de todos os cards
@@ -893,21 +892,13 @@
                 currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
                 currentCharacterMouthOpenImage = selectedChar.openMouthImage;
 
-                // Mostra o botão "Iniciar Jogo" após a seleção
-                startGameAfterCharacterSelectButton.style.display = 'block';
+                // INICIA O JOGO DIRETAMENTE APÓS A SELEÇÃO
+                showCaiRolaGameScreen(); 
+                startCaiRolaGame(); 
             });
         });
 
-        // Event listener para o novo botão "Iniciar Jogo" após a seleção de personagem
-        startGameAfterCharacterSelectButton.addEventListener('click', () => {
-            if (selectedCharacterId) {
-                showCaiRolaGameScreen(); // Transiciona para a tela de início do jogo
-                startCaiRolaGame(); // Inicia o jogo com o personagem selecionado
-            } else {
-                alert('Por favor, selecione um personagem para iniciar o jogo!');
-            }
-        });
-
+        // REMOVIDO: Event listener para o botão "Iniciar Jogo" após a seleção de personagem
 
         // --- Controle de Áudio de Fundo ---
         audioToggleButton.addEventListener('click', () => {
@@ -983,7 +974,6 @@
                 
                 obj.classList.add('rola'); // Adiciona a classe 'rola' para aplicar os estilos CSS
                 obj.style.backgroundImage = `url(${selectedRolaImage})`;
-                // REMOVIDO: Lógica da large-rola, pois a imagem foi removida do array de rolas
             }
 
             // Largura do objeto (usa o valor do CSS ou padrão)
