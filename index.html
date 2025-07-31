@@ -11,36 +11,39 @@
         /* Estilos gerais do corpo da página */
         body {
             margin: 0;
-            overflow: hidden; /* Esconde as barras de rolagem */
+            /* Usar 100dvh para garantir que a altura da viewport dinâmica seja usada,
+               considerando as barras de navegação do navegador */
+            min-height: 100dvh; 
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Garante que o corpo ocupe a altura total da viewport */
-            background: linear-gradient(135deg, #4b0082 0%, #8a2be2 100%); /* Gradiente de fundo roxo escuro */
-            font-family: 'Inter', sans-serif; /* Fonte moderna e limpa */
+            background: linear-gradient(135deg, #4b0082 0%, #8a2be2 100%);
+            font-family: 'Inter', sans-serif;
             color: white;
-            flex-direction: column; /* Organiza os elementos verticalmente */
+            flex-direction: column;
             position: relative;
+            overflow: hidden; /* Garante que não haja rolagem no body */
         }
 
         /* Estilos do contêiner principal do jogo */
         #game-container {
             position: relative;
-            width: 95%; /* Largura responsiva, maior para celular */
-            max-width: 900px; /* Largura máxima para tablets/desktops */
-            height: 90vh; /* Altura responsiva para caber na tela */
-            background-color: #333; /* Fundo escuro para o jogo */
-            border-radius: 30px; /* Cantos mais arredondados */
-            overflow: hidden; /* Importante para que os objetos caindo não saiam da área visível */
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); /* Sombra mais pronunciada e escura */
-            border: 12px solid #ff69b4; /* Borda grossa e rosa choque */
+            width: 95%;
+            max-width: 900px;
+            /* Ajuste da altura para subtrair espaço das barras de navegação e garantir que caiba na tela.
+               O 100dvh é a altura total da viewport, e subtraímos um valor para margem/padding. */
+            height: calc(100dvh - 40px); /* Ajustado para caber na tela sem rolagem */
+            background-color: #333;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            border: 12px solid #ff69b4;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            /* Fundo do jogo com a imagem fornecida */
-            background-image: url('https://iili.io/FUu2yhv.jpg'); /* Link do cenário atualizado */
-            background-size: cover; /* Garante que a imagem cubra todo o contêiner */
+            background-image: url('https://iili.io/FUu2yhv.jpg');
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
@@ -52,38 +55,38 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.98); /* Fundo quase opaco */
+            background-color: rgba(0, 0, 0, 0.98);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 100; /* Garante que fique acima de outros elementos */
+            z-index: 100;
             border-radius: 25px;
             text-align: center;
         }
 
         /* Estilos do título na tela de início */
         #start-screen h1 {
-            font-size: 5em; /* Título ainda maior */
+            font-size: 5em;
             margin-bottom: 50px;
-            color: #FFD700; /* Cor dourada */
-            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.9); /* Sombra mais forte no texto */
-            letter-spacing: 4px; /* Espaçamento entre letras */
+            color: #FFD700;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.9);
+            letter-spacing: 4px;
             text-transform: uppercase;
-            font-weight: 900; /* Mais negrito */
+            font-weight: 900;
         }
 
         /* Estilos do botão de iniciar */
         #start-button {
-            padding: 30px 60px; /* Botão ainda maior */
-            font-size: 3em; /* Texto maior no botão */
-            background: linear-gradient(145deg, #ff1493, #ff69b4); /* Gradiente de rosa profundo */
+            padding: 30px 60px;
+            font-size: 3em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
             color: white;
             border: none;
-            border-radius: 25px; /* Cantos mais arredondados */
+            border-radius: 25px;
             cursor: pointer;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-            transition: all 0.3s ease; /* Transição suave para efeitos de hover */
+            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: bold;
@@ -91,19 +94,19 @@
 
         /* Efeito de hover no botão de iniciar */
         #start-button:hover {
-            transform: translateY(-10px); /* Move o botão ligeiramente para cima */
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); /* Sombra maior */
-            background: linear-gradient(145deg, #ff69b4, #ff1493); /* Inverte o gradiente no hover */
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
         /* Estilos do display de pontuação */
         #score-display {
             position: absolute;
-            top: 50px; /* AJUSTADO: Mais para baixo para não ser cortado */
-            left: 35px;
-            font-size: 3.5em; /* Pontuação ainda maior */
+            top: 15px; /* AJUSTADO: Mais para cima para não ser cortado */
+            left: 20px; /* AJUSTADO: Mais para dentro */
+            font-size: 3.5em;
             font-weight: bold;
-            color: #FFD700; /* Cor dourada para a pontuação */
+            color: #FFD700;
             text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
             z-index: 10;
         }
@@ -111,11 +114,11 @@
         /* Estilos do display de vidas */
         #lives-display {
             position: absolute;
-            top: 50px; /* AJUSTADO: Mais para baixo para não ser cortado */
-            right: 35px;
-            font-size: 3.5em; /* Vidas ainda maior */
+            top: 15px; /* AJUSTADO: Mais para cima para não ser cortado */
+            right: 20px; /* AJUSTADO: Mais para dentro */
+            font-size: 3.5em;
             font-weight: bold;
-            color: #FFD700; /* Cor dourada para as vidas */
+            color: #FFD700;
             text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
             z-index: 10;
         }
@@ -124,52 +127,51 @@
         #character {
             position: absolute;
             bottom: 100px; /* Posição do personagem */
-            width: 160px; /* AJUSTADO: Ligeiramente maior */
-            height: 160px; /* AJUSTADO: Ligeiramente maior */
-            background-size: contain; /* Ajusta a imagem para caber no elemento */
+            width: 180px; /* AJUSTADO: Ligeiramente maior */
+            height: 180px; /* AJUSTADO: Ligeiramente maior */
+            background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            /* Transição para imagem e transformação (para o efeito de "salto") */
             transition: background-image 0.1s ease-in-out, transform 0.15s ease-out;
-            z-index: 5; /* Personagem acima dos objetos caindo */
-            cursor: grab; /* Indica que o elemento pode ser arrastado */
+            z-index: 5;
+            cursor: grab;
         }
 
         /* Animação para o efeito de "comer" (salto e leve escala) */
         @keyframes eatAnimation {
             0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-5px) scale(1.01); } /* Salta menos e aumenta bem pouco */
+            50% { transform: translateY(-5px) scale(1.01); }
             100% { transform: translateY(0) scale(1); }
         }
 
         /* Classe para ativar a animação de comer */
         .character-eating {
-            animation: eatAnimation 0.3s ease-out; /* Duração da animação de comer */
+            animation: eatAnimation 0.3s ease-out;
         }
 
         /* Estilos para os objetos "rola" caindo */
         .rola {
             position: absolute;
-            width: 100px; /* Largura da rola DIMINUIDA */
-            height: 100px; /* Altura da rola DIMINUIDA */
+            width: 100px;
+            height: 100px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            z-index: 4; /* Rolas abaixo do personagem */
-            animation: rotate 3s linear infinite; /* Animação de rotação mais lenta */
+            z-index: 4;
+            animation: rotate 3s linear infinite;
         }
 
         /* Estilos para o novo objeto de penalidade */
         .penalty-object {
             position: absolute;
-            width: 100px; /* Mesma largura das rolas DIMINUIDA */
-            height: 100px; /* Mesma altura das rolas DIMINUIDA */
+            width: 100px;
+            height: 100px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            z-index: 4; /* Objeto de penalidade abaixo do personagem */
-            animation: rotate 3s linear infinite; /* Animação de rotação */
-            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)); /* Sombra vermelha para destacar perigo */
+            z-index: 4;
+            animation: rotate 3s linear infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
         }
 
         /* Animação de rotação para os objetos */
@@ -190,12 +192,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.98); /* Fundo quase opaco */
-            display: none; /* Escondido por padrão */
+            background-color: rgba(0, 0, 0, 0.98);
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 101; /* Acima de tudo */
+            z-index: 101;
             border-radius: 25px;
             text-align: center;
         }
@@ -234,7 +236,7 @@
         #restart-button:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            background: linear-gradient(145deg, #ff69b4, #ff1493); /* Inverte o gradiente no hover */
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
         /* Estilos da tela de seleção de jogo (Menu Principal) */
@@ -244,50 +246,50 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #2c005e 0%, #6a1a9e 100%); /* Gradiente mais escuro e elegante */
+            background: linear-gradient(135deg, #2c005e 0%, #6a1a9e 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 102; /* Acima de tudo */
-            border-radius: 30px; /* Cantos arredondados do menu */
+            z-index: 102;
+            border-radius: 30px;
             text-align: center;
-            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5); /* Sombra interna para profundidade */
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
         }
 
         #main-menu h1 {
-            font-size: 4.5em; /* Título um pouco menor para melhor proporção */
-            margin-bottom: 80px; /* Mais espaço abaixo do título */
-            color: #FFD700; /* Cor dourada */
-            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7); /* Sombra mais suave */
-            letter-spacing: 5px; /* Mais espaçamento entre letras */
+            font-size: 4.5em;
+            margin-bottom: 80px;
+            color: #FFD700;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+            letter-spacing: 5px;
             text-transform: uppercase;
             font-weight: 900;
         }
 
         .menu-button {
-            padding: 25px 60px; /* Botões maiores e mais espaçados */
-            font-size: 2.8em; /* Fonte um pouco maior */
-            background: linear-gradient(145deg, #ff1493, #ff69b4); /* Gradiente de rosa profundo */
+            padding: 25px 60px;
+            font-size: 2.8em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
             color: white;
             border: none;
-            border-radius: 30px; /* Cantos mais arredondados */
+            border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6); /* Sombra mais pronunciada */
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: bold;
-            margin: 25px; /* Mais margem entre os botões */
-            min-width: 350px; /* Garante largura mínima para os botões */
-            border: 3px solid #FFD700; /* Borda dourada sutil */
+            margin: 25px;
+            min-width: 350px;
+            border: 3px solid #FFD700;
         }
 
         .menu-button:hover {
-            transform: translateY(-12px); /* Move o botão ligeiramente mais para cima */
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8); /* Sombra maior no hover */
-            background: linear-gradient(145deg, #ff69b4, #ff1493); /* Inverte o gradiente no hover */
-            border-color: #ff1493; /* Borda muda de cor no hover */
+            transform: translateY(-12px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            border-color: #ff1493;
         }
 
         /* Oculta o wrapper do jogo por padrão, será exibido via JS */
@@ -313,9 +315,9 @@
             border: 2px solid #FFD700;
             border-radius: 15px;
             cursor: pointer;
-            z-index: 10; /* Acima do game-container */
+            z-index: 10;
             transition: background-color 0.3s ease, border-color 0.3s ease;
-            display: none; /* Escondido por padrão, só aparece no jogo */
+            display: none;
         }
 
         #audio-toggle-button:hover {
@@ -331,11 +333,11 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.98);
-            display: none; /* Escondido por padrão */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 101; /* Acima do wrapper do jogo, abaixo do menu principal */
+            z-index: 101;
             border-radius: 25px;
             text-align: center;
             padding: 20px;
@@ -350,53 +352,53 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             font-weight: 900;
-            padding-top: 50px; /* AJUSTADO: Mais padding para o título não ser cortado */
+            padding-top: 50px;
         }
 
         .character-selection-container {
             display: flex;
-            justify-content: space-evenly; /* Espaçamento igual entre os personagens */
-            align-items: center; /* Alinha os personagens verticalmente no centro */
+            justify-content: space-evenly;
+            align-items: center;
             width: 100%;
             max-width: 900px;
             margin-bottom: 50px;
-            flex-wrap: nowrap; /* Impede que os cards quebrem em linha em telas maiores */
-            height: 60%; /* Dá mais altura para os personagens */
+            flex-wrap: nowrap;
+            height: 60%;
         }
 
         .character-card {
-            background-color: transparent; /* Fundo transparente */
-            border: none; /* Sem borda na carta */
-            padding: 0; /* Sem padding na carta */
+            background-color: transparent;
+            border: none;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             cursor: pointer;
             transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
-            box-shadow: none; /* Sem sombra na carta */
+            box-shadow: none;
             position: relative;
-            flex: 1; /* Ocupa espaço igual */
-            max-width: 45%; /* Limita a largura de cada personagem */
-            justify-content: center; /* Centraliza o conteúdo verticalmente */
+            flex: 1;
+            max-width: 45%;
+            justify-content: center;
         }
 
         .character-card:hover {
-            transform: translateY(-15px); /* Efeito de elevação maior no hover */
-            filter: brightness(1.1); /* Brilho no hover */
+            transform: translateY(-15px);
+            filter: brightness(1.1);
         }
 
         /* Efeito de personagem selecionado */
         .character-card.selected {
-            filter: brightness(1.2) drop-shadow(0 0 20px #ff69b4); /* Brilho e sombra rosa forte */
-            transform: translateY(-20px) scale(1.05); /* Mais destaque */
+            filter: brightness(1.2) drop-shadow(0 0 20px #ff69b4);
+            transform: translateY(-20px) scale(1.05);
             opacity: 1;
         }
 
         .character-card:not(.selected) {
-            opacity: 0.7; /* Diminui opacidade dos não selecionados */
+            opacity: 0.7;
         }
         .character-card:not(.selected):hover {
-            opacity: 1; /* Volta a opacidade no hover */
+            opacity: 1;
         }
 
 
@@ -407,7 +409,7 @@
             margin-bottom: 15px;
             border-radius: 0;
             border: none;
-            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.7)); /* Sombra para destacar a imagem */
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.7));
         }
 
         .character-card h3 {
@@ -432,8 +434,8 @@
             transition: all 0.2s ease;
             text-transform: uppercase;
             font-weight: bold;
-            margin-top: 50px; /* Margem para separar do container de personagens */
-            display: none; /* Escondido por padrão, só aparece após seleção */
+            margin-top: 50px;
+            display: none;
         }
 
         #start-game-after-character-select:hover {
@@ -446,7 +448,7 @@
         @media (max-width: 768px) {
             #game-container {
                 width: 95%;
-                height: 90vh; /* Ajuste para tablets */
+                height: calc(100dvh - 30px); /* Ajuste para tablets */
             }
             #start-screen h1 {
                 font-size: 3.5em;
@@ -457,11 +459,13 @@
             }
             #score-display, #lives-display {
                 font-size: 2.2em;
-                top: 30px; /* AJUSTADO: Mais para baixo para tablets */
+                top: 20px; /* AJUSTADO: Mais para baixo para tablets */
+                left: 15px; /* AJUSTADO */
+                right: 15px; /* AJUSTADO */
             }
             #character {
-                width: 120px;
-                height: 120px;
+                width: 140px; /* AJUSTADO: Ligeiramente maior para tablets */
+                height: 140px; /* AJUSTADO: Ligeiramente maior para tablets */
                 bottom: 20px; /* AJUSTADO: Posição do personagem para tablets */
             }
             .rola {
@@ -511,8 +515,8 @@
                 max-width: 48%;
             }
             .character-card img {
-                width: 200px; /* AJUSTADO: Tamanho fixo para tablets */
-                height: 200px; /* AJUSTADO: Tamanho fixo para tablets */
+                width: 180px; /* AJUSTADO: Tamanho fixo para tablets */
+                height: 180px; /* AJUSTADO: Tamanho fixo para tablets */
             }
             .character-card h3 {
                 font-size: 1.5em;
@@ -527,7 +531,7 @@
         /* Ajustes responsivos para telas muito pequenas (smartphones) */
         @media (max-width: 480px) {
             #game-container {
-                height: 95vh; /* Ajuste mais agressivo para smartphones */
+                height: calc(100dvh - 20px); /* Ajuste mais agressivo para smartphones */
             }
             #start-screen h1 {
                 font-size: 2.5em;
@@ -538,17 +542,17 @@
             }
             #score-display {
                 font-size: 1.2em;
-                top: 20px; /* AJUSTADO: Mais para baixo para smartphones */
+                top: 10px; /* AJUSTADO: Mais para baixo para smartphones */
                 left: 10px;
             }
             #lives-display {
                 font-size: 1.2em;
-                top: 20px; /* AJUSTADO: Mais para baixo para smartphones */
+                top: 10px; /* AJUSTADO: Mais para baixo para smartphones */
                 right: 10px;
             }
             #character {
-                width: 90px; /* AJUSTADO: Ligeiramente maior para smartphones */
-                height: 90px; /* AJUSTADO: Ligeiramente maior para smartphones */
+                width: 100px; /* AJUSTADO: Ligeiramente maior para smartphones */
+                height: 100px; /* AJUSTADO: Ligeiramente maior para smartphones */
                 bottom: 15px; /* Posição do personagem para smartphones */
             }
             .rola {
@@ -592,7 +596,7 @@
                 padding-top: 10px;
             }
             .character-selection-container {
-                flex-direction: column; /* Empilha os cards verticalmente */
+                flex-direction: column;
                 gap: 20px;
                 height: auto;
             }
@@ -983,7 +987,7 @@
             obj.style.left = `${obj.x}px`;
             obj.style.top = `${obj.y}px`;
 
-            // Define uma velocidade de queda aleatória para cada objeto (mais lento)
+            // Define uma velocidade de caída aleatória para cada objeto (mais lento)
             obj.speed = 4 + Math.random() * 2; // Velocidade entre 4 e 6
 
             obj.mouthOpenTriggered = false; // Flag para controlar se a boca já abriu para este objeto
