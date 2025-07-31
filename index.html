@@ -1,515 +1,801 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savana Eventos</title>
-    
-    <!-- Meta Tags Essenciais para SEO -->
-    <meta name="description" content="Savana Fest em Lavras! Garanta sua pré-venda por R$ 30. Evento em 06/09 com DJ Papas, DJ Lunardi e mais.">
-    <meta name="keywords" content="Savana Eventos, Savana Fest, ingresso, pré-venda, Lavras, festa, DJ Papas, DJ Lunardi, 06 de setembro">
-    <meta name="author" content="Savana Eventos">
-
-    <!-- Open Graph / Facebook Meta Tags -->
-    <meta property="og:title" content="Savana Eventos - Pré-Venda Savana Fest">
-    <meta property="og:description" content="A melhor festa de Lavras está chegando! Pré-venda por R$ 30. Clique e garanta o seu.">
-    <meta property="og:image" content="https://iili.io/Fj0qcOJ.png">
-    <meta property="og:url" content="https://savanaeventos.com.br">
-    <meta property="og:type" content="website">
-
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Savana Eventos - Pré-Venda Savana Fest">
-    <meta name="twitter:description" content="A melhor festa de Lavras está chegando! Pré-venda por R$ 30. Clique e garanta o seu.">
-    <meta name="twitter:image" content="https://iili.io/Fj0qcOJ.png">
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="https://iili.io/FCvz5DQ.png" type="image/png">
-
+    <title>Comedor de Rolas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Tone.js para geração de áudio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <style>
-        :root {
-            --cor-principal: #E711F0;
-        }
-        
+        /* Estilos gerais do corpo da página */
         body {
-            background-color: #0a0a0a;
-            font-family: 'Poppins', sans-serif;
-            color: #f0f0f0;
+            margin: 0;
+            overflow: hidden; /* Esconde as barras de rolagem */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Garante que o corpo ocupe a altura total da viewport */
+            background: linear-gradient(135deg, #4b0082 0%, #8a2be2 100%); /* Gradiente de fundo roxo escuro */
+            font-family: 'Inter', sans-serif; /* Fonte moderna e limpa */
+            color: white;
+            flex-direction: column; /* Organiza os elementos verticalmente */
+            position: relative;
         }
-        
-        #particles-container {
-            position: fixed;
+
+        /* Estilos do contêiner principal do jogo */
+        #game-container {
+            position: relative;
+            width: 95%; /* Largura responsiva, maior para celular */
+            max-width: 900px; /* Largura máxima para tablets/desktops */
+            height: 900px; /* Altura da área do jogo AUMENTADA */
+            background-color: #333; /* Fundo escuro para o jogo */
+            border-radius: 30px; /* Cantos mais arredondados */
+            overflow: hidden; /* Importante para que os objetos caindo não saiam da área visível */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); /* Sombra mais pronunciada e escura */
+            border: 12px solid #ff69b4; /* Borda grossa e rosa choque */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* Fundo do jogo com a imagem fornecida */
+            background-image: url('https://iili.io/FUu2yhv.jpg'); /* Link do cenário atualizado */
+            background-size: cover; /* Garante que a imagem cubra todo o contêiner */
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Estilos da tela de início do jogo */
+        #start-screen {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Colocado atrás de todo o conteúdo */
-        }
-        
-        #content-wrapper {
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-button {
-            background-color: var(--cor-principal);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(231, 17, 240, 0.4);
-        }
-        .cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(231, 17, 240, 0.6);
-        }
-
-        .dj-card {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.98); /* Fundo quase opaco */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Garante que fique acima de outros elementos */
+            border-radius: 25px;
             text-align: center;
         }
-        .dj-image {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            border: 2px solid var(--cor-principal);
+
+        /* Estilos do título na tela de início */
+        #start-screen h1 {
+            font-size: 5em; /* Título ainda maior */
+            margin-bottom: 50px;
+            color: #FFD700; /* Cor dourada */
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.9); /* Sombra mais forte no texto */
+            letter-spacing: 4px; /* Espaçamento entre letras */
+            text-transform: uppercase;
+            font-weight: 900; /* Mais negrito */
         }
-        .surprise-card {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
+
+        /* Estilos do botão de iniciar */
+        #start-button {
+            padding: 30px 60px; /* Botão ainda maior */
+            font-size: 3em; /* Texto maior no botão */
+            background: linear-gradient(145deg, #ff1493, #ff69b4); /* Gradiente de rosa profundo */
+            color: white;
+            border: none;
+            border-radius: 25px; /* Cantos mais arredondados */
+            cursor: pointer;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease; /* Transição suave para efeitos de hover */
+            text-transform: uppercase; /* Texto em maiúsculas */
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        /* Efeito de hover no botão de iniciar */
+        #start-button:hover {
+            transform: translateY(-10px); /* Move o botão ligeiramente para cima */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); /* Sombra maior */
+            background: linear-gradient(145deg, #ff69b4, #ff1493); /* Inverte o gradiente no hover */
+        }
+
+        /* Estilos do display de pontuação */
+        #score-display {
+            position: absolute;
+            top: 35px;
+            left: 35px;
+            font-size: 3.5em; /* Pontuação ainda maior */
+            font-weight: bold;
+            color: #FFD700; /* Cor dourada para a pontuação */
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        /* Estilos do display de vidas */
+        #lives-display {
+            position: absolute;
+            top: 35px;
+            right: 35px;
+            font-size: 3.5em; /* Vidas ainda maior */
+            font-weight: bold;
+            color: #FFD700; /* Cor dourada para as vidas */
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        /* Estilos do personagem principal */
+        #character {
+            position: absolute;
+            bottom: 70px; /* Posição do personagem na parte inferior, mais acima */
+            width: 150px; /* Largura do personagem DIMINUIDA */
+            height: 150px; /* Altura do personagem DIMINUIDA */
+            background-size: contain; /* Ajusta a imagem para caber no elemento */
+            background-repeat: no-repeat;
+            background-position: center;
+            /* Transição para imagem e transformação (para o efeito de "salto") */
+            transition: background-image 0.1s ease-in-out, transform 0.15s ease-out;
+            z-index: 5; /* Personagem acima dos objetos caindo */
+            cursor: grab; /* Indica que o elemento pode ser arrastado */
+        }
+
+        /* Animação para o efeito de "comer" (salto e leve escala) */
+        @keyframes eatAnimation {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.01); } /* Salta menos e aumenta bem pouco */
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        /* Classe para ativar a animação de comer */
+        .character-eating {
+            animation: eatAnimation 0.3s ease-out; /* Duração da animação de comer */
+        }
+
+        /* Estilos para os objetos "rola" caindo */
+        .rola {
+            position: absolute;
+            width: 100px; /* Largura da rola DIMINUIDA */
+            height: 100px; /* Altura da rola DIMINUIDA */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 4; /* Rolas abaixo do personagem */
+            animation: rotate 3s linear infinite; /* Animação de rotação mais lenta */
+        }
+
+        /* Estilos para o novo objeto de penalidade */
+        .penalty-object {
+            position: absolute;
+            width: 100px; /* Mesma largura das rolas DIMINUIDA */
+            height: 100px; /* Mesma altura das rolas DIMINUIDA */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 4; /* Objeto de penalidade abaixo do personagem */
+            animation: rotate 3s linear infinite; /* Animação de rotação */
+            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)); /* Sombra vermelha para destacar perigo */
+        }
+
+        /* Animação de rotação para os objetos */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Oculta os controles móveis (setas) que não são mais necessários */
+        #mobile-controls {
+            display: none;
+        }
+
+        /* Estilos da tela de fim de jogo */
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.98); /* Fundo quase opaco */
+            display: none; /* Escondido por padrão */
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            z-index: 101; /* Acima de tudo */
+            border-radius: 25px;
+            text-align: center;
+        }
+
+        #game-over-screen h2 {
+            font-size: 4em;
+            margin-bottom: 30px;
+            color: #FFD700;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.9);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        #game-over-screen p {
+            font-size: 2.5em;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        #restart-button {
+            padding: 20px 40px;
+            font-size: 2.5em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        #restart-button:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+        }
+
+        /* Estilos da tela de seleção de jogo */
+        #main-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 102; /* Acima de tudo */
+            border-radius: 25px;
+            text-align: center;
+        }
+
+        #main-menu h1 {
+            font-size: 4em;
+            margin-bottom: 60px;
+            color: #FFD700;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.9);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        .menu-button {
+            padding: 25px 50px;
+            font-size: 2.5em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+            margin: 20px;
+            min-width: 300px; /* Garante largura mínima para os botões */
+        }
+
+        .menu-button:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+        }
+
+        /* Oculta o wrapper do jogo por padrão, será exibido via JS */
+        #cai-rola-game-wrapper {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
         }
 
-        /* Estilos para o Modal */
-        .modal-overlay {
-            transition: opacity 0.3s ease;
+        /* Ajustes responsivos para telas menores (tablets) */
+        @media (max-width: 768px) {
+            #game-container {
+                width: 95%;
+                height: 80vh; /* Altura responsiva para tablets */
+            }
+            #start-screen h1 {
+                font-size: 3.5em;
+            }
+            #start-button {
+                padding: 18px 35px;
+                font-size: 1.8em;
+            }
+            #score-display, #lives-display {
+                font-size: 2.2em;
+                top: 20px; /* Ajuste a posição para telas menores */
+            }
+            #character {
+                width: 120px; /* Reduzido para tablets */
+                height: 120px; /* Reduzido para tablets */
+                bottom: 50px;
+            }
+            .rola, .penalty-object {
+                width: 80px; /* Reduzido para tablets */
+                height: 80px; /* Reduzido para tablets */
+            }
+            #game-over-screen h2 {
+                font-size: 3em;
+            }
+            #game-over-screen p {
+                font-size: 1.8em;
+            }
+            #restart-button {
+                padding: 12px 25px;
+                font-size: 1.8em;
+            }
+            #main-menu h1 {
+                font-size: 3em;
+            }
+            .menu-button {
+                padding: 20px 40px;
+                font-size: 2em;
+                min-width: 250px;
+            }
         }
-        .modal-container {
-            transition: transform 0.3s ease;
+
+        /* Ajustes responsivos para telas muito pequenas (smartphones) */
+        @media (max-width: 480px) {
+            #game-container {
+                height: 85vh; /* Altura responsiva para smartphones */
+                border-radius: 20px;
+            }
+            #start-screen h1 {
+                font-size: 2.8em;
+            }
+            #start-button {
+                padding: 12px 25px;
+                font-size: 1.5em;
+            }
+            #score-display {
+                font-size: 1.5em; /* Fonte menor para caber na tela */
+                top: 15px;
+                left: 15px;
+            }
+            #lives-display {
+                font-size: 1.5em; /* Fonte menor para caber na tela */
+                top: 15px;
+                right: 15px;
+            }
+            #character {
+                width: 90px; /* Reduzido para smartphones */
+                height: 90px; /* Reduzido para smartphones */
+                bottom: 30px;
+            }
+            .rola, .penalty-object {
+                width: 60px; /* Reduzido para smartphones */
+                height: 60px; /* Reduzido para smartphones */
+            }
+            #game-over-screen h2 {
+                font-size: 2.5em;
+            }
+            #game-over-screen p {
+                font-size: 1.2em;
+            }
+            #restart-button {
+                padding: 10px 20px;
+                font-size: 1.2em;
+            }
+            #main-menu h1 {
+                font-size: 2.5em;
+            }
+            .menu-button {
+                padding: 15px 30px;
+                font-size: 1.5em;
+                min-width: 200px;
+            }
         }
     </style>
 </head>
 <body>
+    <div id="game-container">
+        <!-- Tela de seleção de jogo (Menu Principal) -->
+        <div id="main-menu">
+            <h1>Escolha seu Jogo</h1>
+            <button id="cai-rola-button" class="menu-button">CAI ROLA</button>
+            <button id="pica-man-button" class="menu-button">PICA-MAN (Em Breve)</button>
+        </div>
 
-    <div id="particles-container"></div>
-
-    <!-- Modal de Autenticação -->
-    <div id="auth-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center p-4 hidden opacity-0">
-        <div class="modal-container bg-gray-900 border border-gray-700 rounded-lg p-8 w-full max-w-md transform -translate-y-10">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="modal-title" class="text-2xl font-bold">Login</h2>
-                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+        <!-- Wrapper para o jogo "CAI ROLA" -->
+        <div id="cai-rola-game-wrapper">
+            <!-- Tela de início do jogo "CAI ROLA" -->
+            <div id="start-screen">
+                <h1>Comedor de Rolas</h1>
+                <button id="start-button">Iniciar Jogo</button>
             </div>
-            <form id="auth-form">
-                <!-- Campo de Nome (apenas para registro) -->
-                <div id="name-field-container" class="mb-4 hidden">
-                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Nome Completo</label>
-                    <input type="text" id="name" class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
-                    <input type="password" id="password" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
-                </div>
-                <p id="auth-error" class="text-red-500 text-sm mb-4 hidden"></p>
-                <button id="auth-submit-btn" type="submit" class="cta-button w-full text-white font-bold rounded-md py-3 uppercase">Entrar</button>
-            </form>
-            <p class="text-center text-sm text-gray-400 mt-6">
-                <span id="modal-switch-text">Não tem uma conta?</span>
-                <button id="switch-auth-mode-btn" class="font-semibold text-[var(--cor-principal)] hover:underline">Registre-se</button>
-            </p>
+            <!-- Display de pontuação -->
+            <div id="score-display">Rolas: 0</div>
+            <!-- Display de vidas -->
+            <div id="lives-display">Vidas: 3</div>
+            <!-- Personagem principal -->
+            <div id="character"></div>
+            <!-- Tela de Fim de Jogo -->
+            <div id="game-over-screen">
+                <h2>Fim de Jogo!</h2>
+                <p id="final-score">Sua Pontuação Final: 0</p>
+                <button id="restart-button">Jogar Novamente</button>
+            </div>
         </div>
     </div>
-    
-    <!-- Toast de Notificação -->
-    <div id="toast-notification" class="fixed top-5 right-5 bg-green-600 text-white py-2 px-5 rounded-lg shadow-lg opacity-0 transform translate-y-10 transition-all duration-300 z-50">
-        <p id="toast-message">Mensagem aqui!</p>
-    </div>
 
+    <script>
+        // --- Referências aos Elementos HTML ---
+        const gameContainer = document.getElementById('game-container');
+        const character = document.getElementById('character');
+        const scoreDisplay = document.getElementById('score-display');
+        const livesDisplay = document.getElementById('lives-display');
+        const startScreen = document.getElementById('start-screen'); // Tela de início do Cai Rola
+        const startButton = document.getElementById('start-button');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-button');
 
-    <div id="content-wrapper">
-        <header class="py-4 px-6 bg-black/50 backdrop-blur-md sticky top-0 z-40 border-b border-gray-800">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <img src="https://iili.io/FCvz5DQ.png" alt="Logo Savana Eventos" class="h-12">
-                <div id="auth-buttons" class="flex items-center gap-2 sm:gap-4">
-                    <!-- Botões de Login/Registro ou Info do Usuário aparecerão aqui -->
-                </div>
-            </div>
-        </header>
+        // Elementos do Menu Principal
+        const mainMenu = document.getElementById('main-menu');
+        const caiRolaButton = document.getElementById('cai-rola-button');
+        const picaManButton = document.getElementById('pica-man-button');
+        const caiRolaGameWrapper = document.getElementById('cai-rola-game-wrapper');
 
-        <main id="main-content">
-            <!-- Seção Hero com Banner e CTA -->
-            <section class="min-h-screen flex flex-col justify-center items-center p-4">
-                <div class="w-full max-w-4xl mx-auto">
-                    <img src="https://iili.io/Fj0qcOJ.png" alt="Banner da Savana Fest" class="w-full h-auto rounded-lg shadow-2xl shadow-purple-500/10 mb-10">
-                    <div id="ingressos" class="bg-black/50 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center">
-                        <h1 class="text-3xl md:text-4xl font-black uppercase">Garanta sua <span style="color: var(--cor-principal);">Pré-Venda</span></h1>
-                        <p class="text-gray-300 mt-2">Aproveite o valor especial do primeiro lote. É por tempo limitado!</p>
-                        <p class="text-6xl font-black text-white my-4">R$ 30<span class="text-3xl align-top">,00</span></p>
-                        <a href="#" class="cta-button inline-block text-white font-bold rounded-lg px-12 py-4 uppercase">
-                            Comprar Ingresso
-                        </a>
-                        <p class="text-lg font-semibold mt-6">🗓️ Data: 06 de Setembro</p>
-                    </div>
-                </div>
-            </section>
+        // --- URLs das Imagens ---
+        const ROLA_IMAGES = [
+            'https://files.catbox.moe/n39c1e.png', // Rola 1
+            'https://files.catbox.moe/qkukmd.png'  // Rola 3
+        ];
+        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // NOVA IMAGEM DE PENALIDADE
 
-            <!-- Seção Line-up Compacta -->
-            <section class="py-16 px-4">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-3xl font-bold text-center mb-8 uppercase">Line-up</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <div class="dj-card">
-                            <img src="https://iili.io/Fjlgv2a.png" alt="DJ Papas" class="dj-image">
-                            <h3 class="font-bold text-xl">DJ PAPAS</h3>
-                        </div>
-                        <div class="dj-card">
-                            <img src="https://iili.io/Fjlg4hN.png" alt="DJ Lunardi" class="dj-image">
-                            <h3 class="font-bold text-xl">DJ LUNARDI</h3>
-                        </div>
-                        <div class="dj-card surprise-card">
-                            <div class="text-center">
-                                <p class="text-4xl">?</p>
-                                <h3 class="font-bold text-xl mt-2">EM BREVE</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
+        const CHARACTER_MOUTH_OPEN_IMAGE = 'https://files.catbox.moe/5dz13l.png';
+        const CHARACTER_MOUTH_CLOSED_IMAGE = 'https://files.catbox.moe/hjspq9.png';
 
-        <!-- Seção de Perfil do Usuário (inicialmente oculta) -->
-        <section id="profile-section" class="hidden min-h-screen flex flex-col justify-center items-center p-4">
-            <div class="w-full max-w-2xl mx-auto bg-black/50 backdrop-blur-sm border border-gray-800 rounded-lg p-8">
-                <h2 class="text-3xl font-bold text-center mb-8 uppercase">Meu Perfil</h2>
-                <form id="profile-form">
-                    <div class="flex flex-col items-center mb-6">
-                        <div class="relative w-32 h-32 rounded-full border-2 border-[var(--cor-principal)] mb-4">
-                            <img id="profile-pic" src="https://placehold.co/128x128/1f2937/9ca3af?text=Foto" alt="Foto de Perfil" class="w-full h-full object-cover rounded-full">
-                        </div>
-                        <p class="text-sm text-gray-400">Seu avatar é gerado automaticamente.</p>
-                    </div>
+        // --- Variáveis de Jogo ---
+        let score = 0;
+        let lives = 3;
+        let characterX = 0;
+        let rolas = []; // Array para armazenar os objetos caindo (incluindo penalidades)
+        let rolaGenerationInterval;
+        let gameRunning = false;
+        let gameOver = false;
 
-                    <div class="mb-4">
-                        <label for="profile-name" class="block text-sm font-medium text-gray-300 mb-1">Nome</label>
-                        <input type="text" id="profile-name" required class="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-[var(--cor-principal)] focus:outline-none">
-                    </div>
-                    <div class="mb-6">
-                        <label for="profile-email" class="block text-sm font-medium text-gray-300 mb-1">Email (não pode ser alterado)</label>
-                        <input type="email" id="profile-email" disabled class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-400 cursor-not-allowed">
-                    </div>
+        // Variáveis para o controle de arrastar
+        let isDragging = false;
+        let touchStartX = 0;
+        let initialCharacterX = 0;
 
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <button type="submit" id="save-profile-btn" class="cta-button w-full text-white font-bold rounded-md py-3 uppercase">Salvar Alterações</button>
-                        <button type="button" id="back-to-main-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-md py-3 uppercase transition-colors">Voltar</button>
-                    </div>
-                </form>
-            </div>
-        </section>
+        // --- Configuração de Áudio com Tone.js ---
+        let collectSynth;
+        let penaltySynth;
 
+        function setupAudio() {
+            // Sintetizador para o som de coleta (gemido suave)
+            collectSynth = new Tone.Synth({
+                oscillator: {
+                    type: "sine"
+                },
+                envelope: {
+                    attack: 0.5, // Ataque suave
+                    decay: 0.1,
+                    sustain: 0.8, // Sustenta o som
+                    release: 0.5 // Liberação suave
+                },
+                volume: -10 // Volume um pouco mais baixo
+            }).toDestination();
 
-        <!-- Rodapé -->
-        <footer class="bg-black/50 backdrop-blur-sm border-t border-white/10 py-12 px-4">
-            <div class="max-w-5xl mx-auto text-center">
-                <img src="https://iili.io/FCvz5DQ.png" alt="Logo Savana Eventos no Rodapé" class="h-16 mx-auto mb-6">
-                <div class="flex justify-center items-center space-x-6 sm:space-x-8 mb-8">
-                    <a href="https://instagram.com/savanalavras" target="_blank" rel="noopener noreferrer" class="group flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-300">
-                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.013-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.08 2.525c.636-.247 1.363-.416 2.427-.465C9.53 2.013 9.884 2 12.315 2zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm5.338-9.87a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" clip-rule="evenodd" /></svg>
-                        <span>Instagram</span>
-                    </a>
-                </div>
-                <div class="text-center text-sm text-gray-500">
-                    <p>&copy; <span id="year"></span> Savana Eventos. Todos os direitos reservados.</p>
-                    <p class="mt-1">CNPJ: 61.477.242/0001-65</p>
-                </div>
-            </div>
-        </footer>
-    </div>
+            // Adiciona um vibrato sutil
+            const vibrato = new Tone.LFO(2, -0.5, 0.5); // Frequência de 2Hz, profundidade de 0.5 semitons
+            vibrato.connect(collectSynth.detune);
+            vibrato.start();
 
-    <!-- Scripts JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.3.0/tsparticles.bundle.min.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Importações do Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import {
-            getAuth,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            onAuthStateChanged,
-            signOut,
-            updateProfile,
-            sendEmailVerification
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        // REMOVEMOS A IMPORTAÇÃO DO STORAGE
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAp9fWl0yyjuQ86i1M1-xmUlCJn67BaMXw", // MANTENHA A SUA CHAVE
-            authDomain: "savana-login.firebaseapp.com",
-            projectId: "savana-login",
-            storageBucket: "savana-login.appspot.com",
-            messagingSenderId: "406943284644",
-            appId: "1:406943284644:web:b3b74b7be0611253f45531",
-            measurementId: "G-6MWL83R3DK"
-        };
-
-        // Inicializa Firebase e seus serviços
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app); // Inicializa Firestore
-
-        // --- DOM Elements ---
-        const authModal = document.getElementById('auth-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const authForm = document.getElementById('auth-form');
-        const authError = document.getElementById('auth-error');
-        const authSubmitBtn = document.getElementById('auth-submit-btn');
-        const switchAuthModeBtn = document.getElementById('switch-auth-mode-btn');
-        const modalTitle = document.getElementById('modal-title');
-        const modalSwitchText = document.getElementById('modal-switch-text');
-        const authButtonsContainer = document.getElementById('auth-buttons');
-        const nameFieldContainer = document.getElementById('name-field-container');
-        const nameInput = document.getElementById('name');
-        
-        const mainContent = document.getElementById('main-content');
-        const profileSection = document.getElementById('profile-section');
-        const profileForm = document.getElementById('profile-form');
-        const profilePicImg = document.getElementById('profile-pic');
-        const profileNameInput = document.getElementById('profile-name');
-        const profileEmailInput = document.getElementById('profile-email');
-        const backToMainBtn = document.getElementById('back-to-main-btn');
-        const saveProfileBtn = document.getElementById('save-profile-btn');
-        
-        const toast = document.getElementById('toast-notification');
-        const toastMessage = document.getElementById('toast-message');
-
-        let isLoginMode = true;
-        let currentUser = null;
-
-        // --- FUNÇÕES GERAIS ---
-        function showToast(message, isError = false) {
-            toastMessage.textContent = message;
-            toast.className = toast.className.replace(/bg-\w+-\d+/, isError ? 'bg-red-600' : 'bg-green-600');
-            toast.classList.remove('opacity-0', 'translate-y-10');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-10');
-            }, 4000);
+            // Sintetizador para o som de penalidade (som mais abrupto/negativo)
+            penaltySynth = new Tone.Synth({
+                oscillator: {
+                    type: "sawtooth" // Onda dente de serra para um som mais áspero
+                },
+                envelope: {
+                    attack: 0.01, // Ataque rápido
+                    decay: 0.2,
+                    sustain: 0.1,
+                    release: 0.3
+                },
+                volume: -8 // Volume um pouco mais alto
+            }).toDestination();
         }
 
-        // --- LÓGICA DO MODAL DE AUTENTICAÇÃO ---
-        function openModal() {
-            authModal.classList.remove('hidden');
-            setTimeout(() => {
-                authModal.classList.remove('opacity-0');
-                authModal.querySelector('.modal-container').classList.remove('-translate-y-10');
-            }, 10);
-        }
-
-        function closeModal() {
-            authModal.classList.add('opacity-0');
-            authModal.querySelector('.modal-container').classList.add('-translate-y-10');
-            setTimeout(() => authModal.classList.add('hidden'), 300);
-            authError.classList.add('hidden');
-            authForm.reset();
-        }
-
-        function updateModalUI() {
-            authError.classList.add('hidden');
-            if (isLoginMode) {
-                modalTitle.textContent = 'Login';
-                authSubmitBtn.textContent = 'Entrar';
-                modalSwitchText.textContent = 'Não tem uma conta?';
-                switchAuthModeBtn.textContent = 'Registre-se';
-                nameFieldContainer.classList.add('hidden');
-                nameInput.required = false;
-            } else {
-                modalTitle.textContent = 'Registrar';
-                authSubmitBtn.textContent = 'Criar Conta';
-                modalSwitchText.textContent = 'Já tem uma conta?';
-                switchAuthModeBtn.textContent = 'Faça Login';
-                nameFieldContainer.classList.remove('hidden');
-                nameInput.required = true;
+        // Função para tocar o som de coleta
+        function playCollectSound() {
+            if (Tone.context.state !== 'running') {
+                Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
             }
+            collectSynth.triggerAttackRelease("C4", "0.8"); // Toca uma nota C4 por 0.8 segundos
         }
 
-        // --- LÓGICA DE NAVEGAÇÃO ENTRE SEÇÕES ---
-        function showProfileSection() {
-            mainContent.classList.add('hidden');
-            profileSection.classList.remove('hidden');
-            loadUserProfile();
+        // Função para tocar o som de penalidade
+        function playPenaltySound() {
+            if (Tone.context.state !== 'running') {
+                Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
+            }
+            penaltySynth.triggerAttackRelease(["F3", "C#3"], "0.5"); // Toca um acorde dissonante por 0.5 segundos
         }
 
-        function showMainContent() {
-            profileSection.classList.add('hidden');
-            mainContent.classList.remove('hidden');
+        // --- Funções de Inicialização ---
+
+        // Função para inicializar a posição do personagem
+        function initializeCharacterPosition() {
+            if (character.offsetWidth === 0) {
+                setTimeout(initializeCharacterPosition, 50);
+                return;
+            }
+            characterX = (gameContainer.offsetWidth / 2) - (character.offsetWidth / 2);
+            character.style.left = `${characterX}px`;
+            character.style.backgroundImage = `url(${CHARACTER_MOUTH_CLOSED_IMAGE})`;
         }
 
-        // --- LÓGICA DE AUTENTICAÇÃO (CORE) ---
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user; 
-            updateAuthUI(user);
-            if (!user) {
-                showMainContent();
+        // --- Gerenciamento de Telas ---
+        function showMainMenu() {
+            mainMenu.style.display = 'flex';
+            caiRolaGameWrapper.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            startScreen.style.display = 'none'; // Garante que a tela de início do jogo esteja escondida
+        }
+
+        function showCaiRolaGame() {
+            mainMenu.style.display = 'none';
+            caiRolaGameWrapper.style.display = 'block'; // Mostra o wrapper do jogo
+            startScreen.style.display = 'flex'; // Mostra a tela de início do jogo Cai Rola
+            gameOverScreen.style.display = 'none'; // Garante que a tela de fim de jogo esteja escondida
+        }
+
+        // --- Início e Loop do Jogo "CAI ROLA" ---
+
+        function startCaiRolaGame() {
+            score = 0; // Reseta a pontuação
+            lives = 3; // Reseta as vidas
+            scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
+            livesDisplay.textContent = `Vidas: ${lives}`; // Atualiza o display de vidas
+            rolas = []; // Limpa quaisquer objetos existentes
+            // Remove todos os elementos .rola e .penalty-object do DOM, caso existam de uma partida anterior
+            document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
+
+            startScreen.style.display = 'none'; // Esconde a tela de início
+            gameOverScreen.style.display = 'none'; // Esconde a tela de fim de jogo
+            gameRunning = true; // Define o estado do jogo como rodando
+            gameOver = false; // Reseta o estado de fim de jogo
+            initializeCharacterPosition(); // Garante que o personagem esteja no centro
+            gameLoop(); // Inicia o loop principal do jogo
+            // Inicia a geração de novos objetos a cada 1200ms (mais lento)
+            rolaGenerationInterval = setInterval(createFallingObject, 1200);
+        }
+
+        // --- Event Listeners para Botões ---
+        caiRolaButton.addEventListener('click', () => {
+            showCaiRolaGame();
+            // Inicializa o áudio aqui, na primeira interação do usuário
+            if (!collectSynth) { // Garante que o setup seja feito apenas uma vez
+                setupAudio();
             }
         });
+        picaManButton.addEventListener('click', () => {
+            alert('PICA-MAN está em desenvolvimento! Volte em breve.'); // Substituir por uma tela real no futuro
+        });
 
-        function updateAuthUI(user) {
-            authButtonsContainer.innerHTML = '';
-            if (user) {
-                authButtonsContainer.innerHTML = `
-                    <button id="profile-btn" class="text-white font-bold text-sm hover:text-[var(--cor-principal)] transition-colors">Meu Perfil</button>
-                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-md px-3 py-2 sm:px-4 transition-colors">Sair</button>
-                `;
-                document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
-                document.getElementById('profile-btn').addEventListener('click', showProfileSection);
-            } else {
-                authButtonsContainer.innerHTML = `
-                    <button id="login-btn" class="text-white font-bold text-sm hover:text-[var(--cor-principal)] transition-colors">Login</button>
-                    <button id="register-btn" class="bg-transparent border border-[var(--cor-principal)] text-[var(--cor-principal)] hover:bg-[var(--cor-principal)] hover:text-white font-bold text-sm rounded-md px-3 py-2 sm:px-4 transition-colors">Registrar</button>
-                `;
-                document.getElementById('login-btn').addEventListener('click', () => { isLoginMode = true; updateModalUI(); openModal(); });
-                document.getElementById('register-btn').addEventListener('click', () => { isLoginMode = false; updateModalUI(); openModal(); });
+        startButton.addEventListener('click', startCaiRolaGame);
+        restartButton.addEventListener('click', startCaiRolaGame);
+
+        // --- Controles de Teclado (para desktop) ---
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+
+            const characterWidth = character.offsetWidth;
+            const gameContainerWidth = gameContainer.offsetWidth;
+            const moveSpeed = 35; // Velocidade de movimento do personagem para teclado
+
+            if (e.key === 'ArrowLeft' || e.key === 'a') {
+                characterX = Math.max(0, characterX - moveSpeed);
+            } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                characterX = Math.min(gameContainerWidth - characterWidth, characterX + moveSpeed);
             }
+            character.style.left = `${characterX}px`;
+        });
+
+        // --- Controles de Toque (para celular) ---
+        character.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Previne o comportamento padrão do toque (ex: rolagem)
+            if (!gameRunning) return;
+            isDragging = true;
+            touchStartX = e.touches[0].clientX;
+            initialCharacterX = characterX; // Armazena a posição inicial do personagem ao iniciar o arrasto
+        }, { passive: false });
+
+        character.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDragging || !gameRunning) return;
+
+            const currentTouchX = e.touches[0].clientX;
+            const deltaX = currentTouchX - touchStartX; // Calcula a diferença do arrasto
+            let newCharacterX = initialCharacterX + deltaX; // Aplica a diferença à posição inicial do personagem
+
+            const characterWidth = character.offsetWidth;
+            const gameContainerWidth = gameContainer.offsetWidth;
+
+            // Limita o movimento do personagem dentro dos limites do contêiner do jogo
+            characterX = Math.max(0, Math.min(gameContainerWidth - characterWidth, newCharacterX));
+            character.style.left = `${characterX}px`;
+        }, { passive: false });
+
+        character.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // --- Criação de Objetos Caindo (Rolas ou Penalidades) ---
+
+        function createFallingObject() {
+            const obj = document.createElement('div'); // Cria um novo elemento div
+
+            // Decide aleatoriamente se será uma "rola" ou um "objeto de penalidade"
+            const isPenalty = Math.random() < 0.25; // 25% de chance de ser um objeto de penalidade
+
+            if (isPenalty) {
+                obj.classList.add('penalty-object'); // Adiciona a classe para estilos de penalidade
+                obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`;
+            } else {
+                obj.classList.add('rola'); // Adiciona a classe 'rola' para aplicar os estilos CSS
+                // Define a imagem de fundo da rola aleatoriamente a partir das URLs fornecidas
+                obj.style.backgroundImage = `url(${ROLA_IMAGES[Math.floor(Math.random() * ROLA_IMAGES.length)]})`;
+            }
+
+            // Largura do objeto (usa o valor do CSS ou padrão)
+            const objWidth = obj.offsetWidth || 100; // Usar o novo tamanho padrão
+            // Define uma posição X inicial aleatória para o objeto
+            obj.x = Math.random() * (gameContainer.offsetWidth - objWidth);
+            obj.y = -objWidth; // Inicia o objeto acima do contêiner do jogo
+
+            obj.style.left = `${obj.x}px`;
+            obj.style.top = `${obj.y}px`;
+
+            // Define uma velocidade de queda aleatória para cada objeto (mais lento)
+            obj.speed = 4 + Math.random() * 2; // Velocidade entre 4 e 6
+
+            obj.mouthOpenTriggered = false; // Flag para controlar se a boca já abriu para este objeto
+
+            gameContainer.appendChild(obj); // Adiciona o objeto ao contêiner do jogo
+            rolas.push(obj); // Adiciona o objeto ao array de objetos ativos
         }
 
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const name = nameInput.value;
+        // --- Loop Principal do Jogo ---
 
-            authError.classList.add('hidden');
-            authSubmitBtn.disabled = true;
-            authSubmitBtn.textContent = 'Processando...';
+        function gameLoop() {
+            if (!gameRunning || gameOver) return; // Se o jogo não estiver rodando ou for game over, para o loop
 
-            try {
-                if (isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, password);
+            const gameContainerHeight = gameContainer.offsetHeight;
+            const characterHeight = character.offsetHeight;
+            const characterWidth = character.offsetWidth;
+            const characterBottom = gameContainerHeight - 70; // Posição inferior do personagem (ajustada pela bottom do CSS)
+            const characterTop = characterBottom - characterHeight; // Posição superior do personagem
+
+            // Distância para a boca abrir antes da colisão (ajustado para o efeito de "camadas")
+            const mouthOpenTriggerDistance = 80; // Aumentado para que a boca abra mais cedo
+            const zIndexBehindCharacter = 3; // Z-index para objetos atrás do personagem
+            const zIndexInFrontOfCharacter = 6; // Z-index para objetos na frente do personagem
+
+            // Itera sobre os objetos de trás para frente para evitar problemas ao remover elementos
+            for (let i = rolas.length - 1; i >= 0; i--) {
+                const obj = rolas[i];
+                obj.y += obj.speed; // Atualiza a posição Y do objeto (faz ele cair)
+                obj.style.top = `${obj.y}px`; // Atualiza a posição do objeto no DOM
+
+                // Obtém as dimensões e posições do objeto
+                const objLeft = obj.x;
+                const objRight = obj.x + (obj.offsetWidth || 100);
+                const objTop = obj.y;
+                const objBottom = obj.y + (obj.offsetHeight || 100);
+
+                // Lógica para abrir a boca antes da colisão e controlar o z-index
+                if (objBottom > (characterTop - mouthOpenTriggerDistance) &&
+                    objBottom < characterTop + (characterHeight / 2) && // Garante que esteja acima do meio do personagem
+                    objRight > characterX &&
+                    objLeft < (characterX + characterWidth)) {
+
+                    // Se a boca ainda não foi acionada para este objeto, aciona a animação
+                    if (!obj.mouthOpenTriggered) {
+                        character.style.backgroundImage = `url(${CHARACTER_MOUTH_OPEN_IMAGE})`; // Abre a boca
+                        character.classList.add('character-eating'); // Adiciona classe para o efeito de "salto"
+                        obj.mouthOpenTriggered = true; // Marca que a boca foi acionada para este objeto
+                    }
+                    // Quando o objeto está na área de "comer", coloca-o atrás do personagem
+                    obj.style.zIndex = zIndexBehindCharacter;
                 } else {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    
-                    // Gera a URL do avatar com as iniciais do nome
-                    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E711F0&color=fff&size=128`;
-
-                    await updateProfile(user, { 
-                        displayName: name,
-                        photoURL: avatarUrl // Salva a URL do avatar no perfil do Auth
-                    });
-                    
-                    await setDoc(doc(db, "users", user.uid), {
-                        uid: user.uid,
-                        name: name,
-                        email: user.email,
-                        photoURL: avatarUrl // Salva a URL também no Firestore
-                    });
-
-                    await sendEmailVerification(user);
-                    showToast("Conta criada! Um e-mail de verificação foi enviado.");
+                    // Se não estiver na área de "comer", garante que esteja na frente (z-index normal)
+                    obj.style.zIndex = zIndexInFrontOfCharacter; // Ou 4, o z-index padrão para rolas/penalidades
                 }
-                closeModal();
-            } catch (error) {
-                console.error("Erro de autenticação:", error.code, error.message);
-                authError.textContent = getFirebaseErrorMessage(error.code);
-                authError.classList.remove('hidden');
-            } finally {
-                authSubmitBtn.disabled = false;
-                updateModalUI();
+
+
+                // --- Detecção de Colisão Efetiva ---
+                if (objRight > characterX &&
+                    objLeft < (characterX + characterWidth) &&
+                    objBottom > characterTop &&
+                    objTop < characterBottom) {
+                    // Colisão detectada!
+                    
+                    if (obj.classList.contains('rola')) {
+                        score++; // Incrementa a pontuação para rolas
+                        playCollectSound(); // Toca o som de coleta
+                    } else if (obj.classList.contains('penalty-object')) {
+                        score -= 30; // Diminui a pontuação em 30
+                        lives--; // Perde 1 vida
+                        livesDisplay.textContent = `Vidas: ${lives}`; // Atualiza o display de vidas
+                        playPenaltySound(); // Toca o som de penalidade
+
+                        if (lives <= 0) {
+                            endGame(); // Chama a função de fim de jogo se as vidas acabarem
+                            return; // Sai do loop para evitar processamento adicional
+                        }
+                    }
+                    scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
+                    obj.remove(); // Remove o objeto do DOM
+                    rolas.splice(i, 1); // Remove o objeto do array
+
+                    // Reseta a animação da boca após um curto atraso
+                    setTimeout(() => {
+                        character.style.backgroundImage = `url(${CHARACTER_MOUTH_CLOSED_IMAGE})`; // Fecha a boca
+                        character.classList.remove('character-eating'); // Remove classe do efeito de "salto"
+                    }, 300); // Duração da animação de boca aberta e salto
+                }
+
+                // Remove o objeto se ele sair da tela (atingir a parte inferior)
+                if (obj.y > gameContainerHeight) {
+                    obj.remove(); // Remove do DOM
+                    rolas.splice(i, 1); // Remove do array
+                    // Não há penalidade por deixar cair, apenas por pegar o errado
+                }
             }
-        });
 
-        // --- LÓGICA DO PERFIL DO USUÁRIO ---
-        async function loadUserProfile() {
-            if (!currentUser) return;
-
-            const userDocRef = doc(db, "users", currentUser.uid);
-            const docSnap = await getDoc(userDocRef);
-
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                profileNameInput.value = userData.name || '';
-                profileEmailInput.value = userData.email || '';
-                profilePicImg.src = userData.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=E711F0&color=fff&size=128`;
-            }
+            // Solicita o próximo quadro de animação (loop contínuo)
+            requestAnimationFrame(gameLoop);
         }
 
-        profileForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
+        // --- Função de Fim de Jogo ---
+        function endGame() {
+            gameRunning = false;
+            gameOver = true;
+            clearInterval(rolaGenerationInterval); // Para a geração de novos objetos
+            // Remove todos os objetos caindo atualmente na tela
+            rolas.forEach(obj => obj.remove());
+            rolas = []; // Limpa o array de objetos
 
-            saveProfileBtn.disabled = true;
-            saveProfileBtn.textContent = 'Salvando...';
-
-            const newName = profileNameInput.value;
-            // A URL do avatar será atualizada se o nome mudar
-            const newAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=E711F0&color=fff&size=128`;
-
-            try {
-                await updateProfile(currentUser, {
-                    displayName: newName,
-                    photoURL: newAvatarUrl
-                });
-
-                const userDocRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userDocRef, {
-                    name: newName,
-                    photoURL: newAvatarUrl
-                });
-                
-                profilePicImg.src = newAvatarUrl;
-                showToast("Perfil atualizado com sucesso!");
-
-            } catch (error) {
-                console.error("Erro ao atualizar perfil:", error);
-                showToast("Erro ao atualizar perfil.", true);
-            } finally {
-                saveProfileBtn.disabled = false;
-                saveProfileBtn.textContent = 'Salvar Alterações';
-            }
-        });
-
-        // --- EVENT LISTENERS GERAIS ---
-        closeModalBtn.addEventListener('click', closeModal);
-        authModal.addEventListener('click', (e) => { if (e.target === authModal) closeModal(); });
-        switchAuthModeBtn.addEventListener('click', () => { isLoginMode = !isLoginMode; updateModalUI(); });
-        backToMainBtn.addEventListener('click', showMainContent);
-
-        function getFirebaseErrorMessage(errorCode) {
-            switch (errorCode) {
-                case 'auth/invalid-email': return 'Formato de e-mail inválido.';
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                case 'auth/invalid-credential': return 'E-mail ou senha incorretos.';
-                case 'auth/email-already-in-use': return 'Este e-mail já está em uso.';
-                case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.';
-                case 'auth/requires-recent-login': return 'Esta operação requer um login recente. Por favor, faça login novamente.';
-                default: return 'Ocorreu um erro. Tente novamente.';
-            }
+            finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`; // Exibe a pontuação final
+            gameOverScreen.style.display = 'flex'; // Mostra a tela de fim de jogo
         }
 
-        // --- LÓGICA DAS PARTÍCULAS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('year').textContent = new Date().getFullYear();
-            tsParticles.load({ id: "particles-container", options: { background: { color: { value: 'transparent' } }, fpsLimit: 60, particles: { number: { value: 80, density: { enable: true, value_area: 800 } }, color: { value: "#E711F0" }, shape: { type: "circle" }, opacity: { value: 0.3, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.05, sync: false } }, size: { value: 2, random: true }, links: { enable: true, distance: 150, color: "#E711F0", opacity: 0.1, width: 1 }, move: { enable: true, speed: 1, direction: "none", random: true, straight: false, out_mode: "out" } }, interactivity: { detect_on: "window", events: { onhover: { enable: true, mode: "grab" }, resize: true }, modes: { grab: { distance: 140, links: { opacity: 0.2 } } } }, detectRetina: true, } });
+        // --- Eventos de Carregamento e Redimensionamento ---
+
+        // Inicializa o menu principal ao carregar a janela
+        window.addEventListener('load', () => {
+            showMainMenu();
         });
+
+        // Lida com o redimensionamento da janela para manter o jogo responsivo
+        window.addEventListener('resize', () => {
+            if (gameRunning) { // Apenas recalcula se o jogo estiver rodando
+                initializeCharacterPosition(); // Recalcula a posição do personagem
+
+                // Ajusta a posição dos objetos se eles ficarem fora dos limites horizontais após o redimensionamento
+                rolas.forEach(obj => {
+                    const objWidth = obj.offsetWidth || 100; // Usar o novo tamanho padrão
+                    if (obj.x + objWidth > gameContainer.offsetWidth) {
+                        obj.x = gameContainer.offsetWidth - objWidth;
+                        obj.style.left = `${obj.x}px`;
+                    }
+                });
+            }
+        });
+
     </script>
 </body>
 </html>
