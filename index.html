@@ -123,7 +123,7 @@
         /* Estilos do personagem principal */
         #character {
             position: absolute;
-            bottom: 80px; /* AJUSTADO: Posição do personagem mais acima para não ser cortado */
+            bottom: 100px; /* AJUSTADO: Posição do personagem mais acima para não ser cortado */
             width: 150px; /* Largura do personagem DIMINUIDA */
             height: 150px; /* Altura do personagem DIMINUIDA */
             background-size: contain; /* Ajusta a imagem para caber no elemento */
@@ -350,16 +350,17 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             font-weight: 900;
+            padding-top: 20px; /* AJUSTADO: Padding para o título não ser cortado */
         }
 
         .character-selection-container {
             display: flex;
-            justify-content: space-around; /* Espaçamento igual entre os personagens */
-            align-items: flex-end; /* Alinha os personagens pela base */
+            justify-content: space-evenly; /* Espaçamento igual entre os personagens */
+            align-items: center; /* Alinha os personagens verticalmente no centro */
             width: 100%;
-            max-width: 900px; /* Aumentado para dar mais espaço aos personagens grandes */
+            max-width: 900px;
             margin-bottom: 50px;
-            flex-wrap: nowrap; /* Impede que os cards quebrem em linha em telas maiores */
+            flex-wrap: nowrap;
             height: 60%; /* Dá mais altura para os personagens */
         }
 
@@ -371,12 +372,12 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease; /* Adicionado opacity para efeito de seleção */
+            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
             box-shadow: none; /* Sem sombra na carta */
             position: relative;
             flex: 1; /* Ocupa espaço igual */
-            max-width: 48%; /* Limita a largura de cada personagem */
-            justify-content: flex-end; /* Alinha o conteúdo ao fundo do card */
+            max-width: 45%; /* Limita a largura de cada personagem */
+            justify-content: center; /* Centraliza o conteúdo verticalmente */
         }
 
         .character-card:hover {
@@ -419,9 +420,8 @@
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
         }
 
-        /* Botão de seleção removido, a seleção é feita no card.
-           Este estilo é apenas para o botão "Iniciar Jogo" que aparecerá depois. */
-        .select-character-button { /* Renomeado para iniciar-jogo-button para clareza */
+        /* Botão para iniciar o jogo após a seleção */
+        #start-game-after-character-select {
             padding: 15px 30px;
             font-size: 1.5em;
             background: linear-gradient(145deg, #ff1493, #ff69b4);
@@ -437,7 +437,7 @@
             display: none; /* Escondido por padrão, só aparece após seleção */
         }
 
-        .select-character-button:hover {
+        #start-game-after-character-select:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             background: linear-gradient(145deg, #ff69b4, #ff1493);
@@ -502,22 +502,23 @@
             #character-select-screen h2 {
                 font-size: 3.5em;
                 margin-bottom: 40px;
+                padding-top: 15px; /* Ajuste para tablets */
             }
             .character-selection-container {
                 gap: 20px;
-                height: 50%; /* Ajusta altura do container de seleção */
+                height: 50%;
             }
             .character-card {
                 max-width: 48%;
             }
             .character-card img {
-                width: 100%; /* Ajustado para preencher o card */
+                width: 100%;
                 max-height: 100%;
             }
             .character-card h3 {
                 font-size: 1.5em;
             }
-            .select-character-button {
+            #start-game-after-character-select {
                 padding: 12px 25px;
                 font-size: 1.2em;
                 margin-top: 30px;
@@ -589,16 +590,17 @@
             #character-select-screen h2 {
                 font-size: 2.2em;
                 margin-bottom: 20px;
+                padding-top: 10px; /* Ajuste para smartphones */
             }
             .character-selection-container {
                 flex-direction: column; /* Empilha os cards verticalmente */
                 gap: 20px;
-                height: auto; /* Altura automática */
+                height: auto;
             }
             .character-card {
-                width: 100%; /* Ocupa a largura total na coluna */
-                max-width: 250px; /* Limite para não ficar gigante em telas muito largas no modo coluna */
-                margin-bottom: 40px; /* Mais espaço entre os cards empilhados */
+                width: 100%;
+                max-width: 250px;
+                margin-bottom: 40px;
             }
             .character-card img {
                 width: 150px; /* Aumentado para smartphones */
@@ -607,7 +609,7 @@
             .character-card h3 {
                 font-size: 1.2em;
             }
-            .select-character-button {
+            #start-game-after-character-select {
                 padding: 10px 20px;
                 font-size: 1em;
                 margin-top: 20px;
@@ -638,7 +640,7 @@
                 </div>
             </div>
             <!-- Botão para iniciar o jogo após a seleção (aparece via JS) -->
-            <button id="start-game-after-character-select" class="select-character-button">Iniciar Jogo</button>
+            <button id="start-game-after-character-select" class="menu-button">Iniciar Jogo</button>
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -1012,7 +1014,7 @@
             const gameContainerHeight = gameContainer.offsetHeight;
             const characterHeight = character.offsetHeight;
             const characterWidth = character.offsetWidth;
-            const characterBottom = gameContainerHeight - 80; // AJUSTADO: Posição inferior do personagem (mesmo valor do CSS)
+            const characterBottom = gameContainerHeight - 100; // AJUSTADO: Posição inferior do personagem (mesmo valor do CSS)
             const characterTop = characterBottom - characterHeight; // Posição superior do personagem
 
             // Distância para a boca abrir antes da colisão (ajustado para o efeito de "camadas")
