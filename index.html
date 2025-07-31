@@ -692,8 +692,11 @@
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
-        let backgroundMusic = new Audio(); // Objeto Audio para música de fundo
+        // REMOVIDO: backgroundMusic = new Audio(); // Esta variável não será mais usada como música de fundo separada
         let collectSound = new Audio('https://files.catbox.moe/qegrfu.mp3'); // Áudio para o som de coleta
+
+        // Variável de controle global para o áudio
+        let isSoundEnabled = true; 
 
         // --- URLs das Imagens ---
         const ROLA_IMAGES = [
@@ -761,7 +764,7 @@
 
         // Função para tocar o som de coleta (usando o áudio fornecido)
         function playCollectSound() {
-            if (collectSound.paused) {
+            if (isSoundEnabled && collectSound.paused) { // Toca somente se o som estiver habilitado
                 collectSound.currentTime = 0; // Reinicia o áudio para tocar do início
                 collectSound.play().catch(e => console.log("Erro ao tocar som de coleta:", e));
             }
@@ -769,10 +772,12 @@
 
         // Função para tocar o som de penalidade (usando Tone.js)
         function playPenaltySound() {
-            if (Tone.context.state !== 'running') {
-                Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
+            if (isSoundEnabled) { // Toca somente se o som estiver habilitado
+                if (Tone.context.state !== 'running') {
+                    Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
+                }
+                penaltySynth.triggerAttackRelease("C3", "0.5"); // Toca uma nota C3 por 0.5 segundos
             }
-            penaltySynth.triggerAttackRelease("C3", "0.5"); // Toca uma nota C3 por 0.5 segundos
         }
 
         // --- Funções de Inicialização ---
@@ -797,8 +802,9 @@
             gameOverScreen.style.display = 'none';
             startScreen.style.display = 'none';
             audioToggleButton.style.display = 'none'; // Esconde o botão de áudio no menu
-            backgroundMusic.pause(); // Pausa a música ao voltar para o menu
+            // REMOVIDO: backgroundMusic.pause(); // Não há mais música de fundo separada
             audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
+            isSoundEnabled = false; // Desativa o som ao voltar para o menu principal
         }
 
         function showCharacterSelectScreen() {
@@ -851,13 +857,8 @@
             // Inicia a geração de novos objetos a cada 1200ms (mais lento)
             rolaGenerationInterval = setInterval(createFallingObject, 1200);
 
-            // Tenta tocar a música de fundo ao iniciar o jogo
-            if (!backgroundMusic.src) { // Define a fonte apenas uma vez
-                backgroundMusic.src = 'SEU_LINK_DO_AUDIO_AQUI.mp3'; // *** SUBSTITUA AQUI PELO SEU LINK DA MÚSICA DE FUNDO ***
-                backgroundMusic.loop = true; // Faz a música tocar em loop
-                backgroundMusic.volume = 0.5; // Ajusta o volume (0.0 a 1.0)
-            }
-            backgroundMusic.play().catch(e => console.log("Erro ao tentar tocar a música de fundo:", e));
+            // Tenta ativar o áudio ao iniciar o jogo
+            isSoundEnabled = true; // Ativa o som ao iniciar o jogo
             audioToggleButton.textContent = 'Gemidos: ON'; // Atualiza o texto do botão
         }
 
@@ -898,14 +899,17 @@
             });
         });
 
-        // --- Controle de Áudio de Fundo ---
+        // --- Controle de Áudio de Fundo (agora controla todos os sons) ---
         audioToggleButton.addEventListener('click', () => {
-            if (backgroundMusic.paused) {
-                backgroundMusic.play().catch(e => console.log("Erro ao tentar tocar a música de fundo:", e));
+            isSoundEnabled = !isSoundEnabled; // Inverte o estado do som
+            if (isSoundEnabled) {
                 audioToggleButton.textContent = 'Gemidos: ON';
+                // Não há música de fundo para tocar aqui, apenas os efeitos serão ativados
             } else {
-                backgroundMusic.pause();
                 audioToggleButton.textContent = 'Gemidos: OFF';
+                // Pausa qualquer som de coleta que esteja tocando
+                collectSound.pause(); 
+                collectSound.currentTime = 0;
             }
         });
 
@@ -1100,8 +1104,9 @@
 
             finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`; // Exibe a pontuação final
             gameOverScreen.style.display = 'flex'; // Mostra a tela de fim de jogo
-            backgroundMusic.pause(); // Pausa a música ao terminar o jogo
+            // REMOVIDO: backgroundMusic.pause(); // Não há mais música de fundo separada
             audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
+            isSoundEnabled = false; // Desativa o som ao terminar o jogo
         }
 
         // --- Eventos de Carregamento e Redimensionamento ---
