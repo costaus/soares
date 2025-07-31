@@ -99,7 +99,7 @@
         /* Estilos do display de pontuação */
         #score-display {
             position: absolute;
-            top: 35px;
+            top: 50px; /* AJUSTADO: Mais para baixo para não ser cortado */
             left: 35px;
             font-size: 3.5em; /* Pontuação ainda maior */
             font-weight: bold;
@@ -111,7 +111,7 @@
         /* Estilos do display de vidas */
         #lives-display {
             position: absolute;
-            top: 35px;
+            top: 50px; /* AJUSTADO: Mais para baixo para não ser cortado */
             right: 35px;
             font-size: 3.5em; /* Vidas ainda maior */
             font-weight: bold;
@@ -123,9 +123,9 @@
         /* Estilos do personagem principal */
         #character {
             position: absolute;
-            bottom: 100px; /* AJUSTADO: Posição do personagem mais acima para não ser cortado */
-            width: 150px; /* Largura do personagem DIMINUIDA */
-            height: 150px; /* Altura do personagem DIMINUIDA */
+            bottom: 100px; /* Posição do personagem */
+            width: 160px; /* AJUSTADO: Ligeiramente maior */
+            height: 160px; /* AJUSTADO: Ligeiramente maior */
             background-size: contain; /* Ajusta a imagem para caber no elemento */
             background-repeat: no-repeat;
             background-position: center;
@@ -401,9 +401,8 @@
 
 
         .character-card img {
-            width: 100%; /* Imagem ocupa 100% da largura do card */
-            height: auto; /* Mantém proporção */
-            max-height: 100%; /* Garante que a imagem não transborde o container */
+            width: 250px; /* AJUSTADO: Tamanho fixo para as imagens dos personagens na seleção */
+            height: 250px; /* AJUSTADO: Tamanho fixo para as imagens dos personagens na seleção */
             object-fit: contain;
             margin-bottom: 15px;
             border-radius: 0;
@@ -458,7 +457,7 @@
             }
             #score-display, #lives-display {
                 font-size: 2.2em;
-                top: 20px;
+                top: 30px; /* AJUSTADO: Mais para baixo para tablets */
             }
             #character {
                 width: 120px;
@@ -512,8 +511,8 @@
                 max-width: 48%;
             }
             .character-card img {
-                width: 100%;
-                max-height: 100%;
+                width: 200px; /* AJUSTADO: Tamanho fixo para tablets */
+                height: 200px; /* AJUSTADO: Tamanho fixo para tablets */
             }
             .character-card h3 {
                 font-size: 1.5em;
@@ -539,18 +538,18 @@
             }
             #score-display {
                 font-size: 1.2em;
-                top: 10px;
+                top: 20px; /* AJUSTADO: Mais para baixo para smartphones */
                 left: 10px;
             }
             #lives-display {
                 font-size: 1.2em;
-                top: 10px;
+                top: 20px; /* AJUSTADO: Mais para baixo para smartphones */
                 right: 10px;
             }
             #character {
-                width: 80px;
-                height: 80px;
-                bottom: 15px; /* AJUSTADO: Posição do personagem para smartphones */
+                width: 90px; /* AJUSTADO: Ligeiramente maior para smartphones */
+                height: 90px; /* AJUSTADO: Ligeiramente maior para smartphones */
+                bottom: 15px; /* Posição do personagem para smartphones */
             }
             .rola {
                 width: 50px;
@@ -603,8 +602,8 @@
                 margin-bottom: 40px;
             }
             .character-card img {
-                width: 150px; /* Aumentado para smartphones */
-                height: 150px; /* Aumentado para smartphones */
+                width: 150px; /* AJUSTADO: Tamanho fixo para smartphones */
+                height: 150px; /* AJUSTADO: Tamanho fixo para smartphones */
             }
             .character-card h3 {
                 font-size: 1.2em;
@@ -662,7 +661,7 @@
                 <button id="restart-button">Jogar Novamente</button>
             </div>
              <!-- Botão de controle de áudio de fundo -->
-            <button id="audio-toggle-button">Música: OFF</button>
+            <button id="audio-toggle-button">Gemidos: OFF</button>
         </div>
     </div>
 
@@ -797,7 +796,7 @@
             startScreen.style.display = 'none';
             audioToggleButton.style.display = 'none'; // Esconde o botão de áudio no menu
             backgroundMusic.pause(); // Pausa a música ao voltar para o menu
-            audioToggleButton.textContent = 'Música: OFF'; // Reseta o texto do botão
+            audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
         }
 
         function showCharacterSelectScreen() {
@@ -807,7 +806,6 @@
             startScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             audioToggleButton.style.display = 'none'; // Esconde o botão de áudio na seleção de personagem
-            // REMOVIDO: Esconder o botão de iniciar jogo inicialmente
 
             // Atualiza as imagens dos personagens na tela de seleção
             document.querySelector('.character-card[data-character-id="carlinha"] img').src = characterData.carlinha.selectionImage;
@@ -858,7 +856,7 @@
                 backgroundMusic.volume = 0.5; // Ajusta o volume (0.0 a 1.0)
             }
             backgroundMusic.play().catch(e => console.log("Erro ao tentar tocar a música de fundo:", e));
-            audioToggleButton.textContent = 'Música: ON'; // Atualiza o texto do botão
+            audioToggleButton.textContent = 'Gemidos: ON'; // Atualiza o texto do botão
         }
 
         // --- Event Listeners para Botões ---
@@ -898,16 +896,14 @@
             });
         });
 
-        // REMOVIDO: Event listener para o botão "Iniciar Jogo" após a seleção de personagem
-
         // --- Controle de Áudio de Fundo ---
         audioToggleButton.addEventListener('click', () => {
             if (backgroundMusic.paused) {
                 backgroundMusic.play().catch(e => console.log("Erro ao tentar tocar a música de fundo:", e));
-                audioToggleButton.textContent = 'Música: ON';
+                audioToggleButton.textContent = 'Gemidos: ON';
             } else {
                 backgroundMusic.pause();
-                audioToggleButton.textContent = 'Música: OFF';
+                audioToggleButton.textContent = 'Gemidos: OFF';
             }
         });
 
@@ -1103,7 +1099,7 @@
             finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`; // Exibe a pontuação final
             gameOverScreen.style.display = 'flex'; // Mostra a tela de fim de jogo
             backgroundMusic.pause(); // Pausa a música ao terminar o jogo
-            audioToggleButton.textContent = 'Música: OFF'; // Reseta o texto do botão
+            audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
         }
 
         // --- Eventos de Carregamento e Redimensionamento ---
