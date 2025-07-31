@@ -642,7 +642,6 @@
                     <h3>Eduardo Vício Pinto</h3>
                 </div>
             </div>
-            <!-- REMOVIDO: Botão para iniciar o jogo após a seleção -->
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -690,7 +689,6 @@
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
         const characterCards = document.querySelectorAll('.character-card'); // Seleciona os cards
-        // REMOVIDO: const startGameAfterCharacterSelectButton = document.getElementById('start-game-after-character-select');
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
@@ -1004,7 +1002,7 @@
             const gameContainerHeight = gameContainer.offsetHeight;
             const characterHeight = character.offsetHeight;
             const characterWidth = character.offsetWidth;
-            const characterBottom = gameContainerHeight - 100; // AJUSTADO: Posição inferior do personagem (mesmo valor do CSS)
+            const characterBottom = gameContainerHeight - 100; // Posição inferior do personagem (mesmo valor do CSS)
             const characterTop = characterBottom - characterHeight; // Posição superior do personagem
 
             // Distância para a boca abrir antes da colisão (ajustado para o efeito de "camadas")
@@ -1055,7 +1053,7 @@
                     // Colisão detectada!
                     
                     if (obj.classList.contains('rola')) {
-                        score++; // Incrementa a pontuação para rolas
+                        score += 3; // AJUSTADO: Incrementa a pontuação em 3 para rolas
                         playCollectSound(); // Toca o som de coleta
                     } else if (obj.classList.contains('penalty-object')) {
                         score -= 30; // Diminui a pontuação em 30
