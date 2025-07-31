@@ -237,54 +237,57 @@
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
-        /* Estilos da tela de seleção de jogo */
+        /* Estilos da tela de seleção de jogo (Menu Principal) - REVISADOS */
         #main-menu {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.98);
+            background: linear-gradient(135deg, #2c005e 0%, #6a1a9e 100%); /* Gradiente mais escuro e elegante */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 102; /* Acima de tudo */
-            border-radius: 25px;
+            border-radius: 30px; /* Cantos arredondados do menu */
             text-align: center;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5); /* Sombra interna para profundidade */
         }
 
         #main-menu h1 {
-            font-size: 4em;
-            margin-bottom: 60px;
-            color: #FFD700;
-            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.9);
-            letter-spacing: 4px;
+            font-size: 4.5em; /* Título um pouco menor para melhor proporção */
+            margin-bottom: 80px; /* Mais espaço abaixo do título */
+            color: #FFD700; /* Cor dourada */
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7); /* Sombra mais suave */
+            letter-spacing: 5px; /* Mais espaçamento entre letras */
             text-transform: uppercase;
             font-weight: 900;
         }
 
         .menu-button {
-            padding: 25px 50px;
-            font-size: 2.5em;
-            background: linear-gradient(145deg, #ff1493, #ff69b4);
+            padding: 25px 60px; /* Botões maiores e mais espaçados */
+            font-size: 2.8em; /* Fonte um pouco maior */
+            background: linear-gradient(145deg, #ff1493, #ff69b4); /* Gradiente de rosa profundo */
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 30px; /* Cantos mais arredondados */
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6); /* Sombra mais pronunciada */
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             font-weight: bold;
-            margin: 20px;
-            min-width: 300px; /* Garante largura mínima para os botões */
+            margin: 25px; /* Mais margem entre os botões */
+            min-width: 350px; /* Garante largura mínima para os botões */
+            border: 3px solid #FFD700; /* Borda dourada sutil */
         }
 
         .menu-button:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
-            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            transform: translateY(-12px); /* Move o botão ligeiramente mais para cima */
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8); /* Sombra maior no hover */
+            background: linear-gradient(145deg, #ff69b4, #ff1493); /* Inverte o gradiente no hover */
+            border-color: #ff1493; /* Borda muda de cor no hover */
         }
 
         /* Oculta o wrapper do jogo por padrão, será exibido via JS */
@@ -333,13 +336,16 @@
                 padding: 12px 25px;
                 font-size: 1.8em;
             }
+            /* Menu Principal Responsivo para Tablets */
             #main-menu h1 {
-                font-size: 3em;
+                font-size: 3.5em;
+                margin-bottom: 60px;
             }
             .menu-button {
-                padding: 20px 40px;
-                font-size: 2em;
-                min-width: 250px;
+                padding: 20px 45px;
+                font-size: 2.2em;
+                min-width: 300px;
+                margin: 20px;
             }
         }
 
@@ -385,13 +391,16 @@
                 padding: 10px 20px;
                 font-size: 1.2em;
             }
+            /* Menu Principal Responsivo para Smartphones */
             #main-menu h1 {
-                font-size: 2.5em;
+                font-size: 2.8em;
+                margin-bottom: 40px;
             }
             .menu-button {
-                padding: 15px 30px;
-                font-size: 1.5em;
-                min-width: 200px;
+                padding: 15px 35px;
+                font-size: 1.8em;
+                min-width: 250px;
+                margin: 15px;
             }
         }
     </style>
@@ -582,7 +591,8 @@
             }
         });
         picaManButton.addEventListener('click', () => {
-            alert('PICA-MAN está em desenvolvimento! Volte em breve.'); // Substituir por uma tela real no futuro
+            // Nova mensagem para o Pica-Man
+            alert('eu ainda vou termina esse pica man, espera. ass: dan 🤭');
         });
 
         startButton.addEventListener('click', startCaiRolaGame);
