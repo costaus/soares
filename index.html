@@ -323,7 +323,7 @@
             border-color: #ff1493;
         }
 
-        /* Estilos da tela de seleção de personagem - REVISADOS E APRIMORADOS */
+        /* Estilos da tela de seleção de personagem - REVISADOS E APRIMORADOS PARA MOBILE */
         #character-select-screen {
             position: absolute;
             top: 0;
@@ -360,7 +360,7 @@
             width: 100%;
             max-width: 900px;
             margin-bottom: 50px;
-            flex-wrap: nowrap;
+            flex-wrap: nowrap; /* Impede que os cards quebrem em linha em telas maiores */
             height: 60%; /* Dá mais altura para os personagens */
         }
 
@@ -502,7 +502,7 @@
             #character-select-screen h2 {
                 font-size: 3.5em;
                 margin-bottom: 40px;
-                padding-top: 15px; /* Ajuste para tablets */
+                padding-top: 15px;
             }
             .character-selection-container {
                 gap: 20px;
@@ -590,12 +590,12 @@
             #character-select-screen h2 {
                 font-size: 2.2em;
                 margin-bottom: 20px;
-                padding-top: 10px; /* Ajuste para smartphones */
+                padding-top: 10px;
             }
             .character-selection-container {
                 flex-direction: column; /* Empilha os cards verticalmente */
                 gap: 20px;
-                height: auto;
+                height: auto; /* Altura automática */
             }
             .character-card {
                 width: 100%;
