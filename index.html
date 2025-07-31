@@ -123,7 +123,7 @@
         /* Estilos do personagem principal */
         #character {
             position: absolute;
-            bottom: 20px; /* AJUSTADO: Posição do personagem mais acima para não ser cortado */
+            bottom: 80px; /* AJUSTADO: Posição do personagem mais acima para não ser cortado */
             width: 150px; /* Largura do personagem DIMINUIDA */
             height: 150px; /* Altura do personagem DIMINUIDA */
             background-size: contain; /* Ajusta a imagem para caber no elemento */
@@ -157,12 +157,6 @@
             background-position: center;
             z-index: 4; /* Rolas abaixo do personagem */
             animation: rotate 3s linear infinite; /* Animação de rotação mais lenta */
-        }
-
-        /* Estilos para a "Rola 2" (maior) */
-        .large-rola {
-            width: 130px; /* Rola 2 maior */
-            height: 130px; /* Rola 2 maior */
         }
 
         /* Estilos para o novo objeto de penalidade */
@@ -329,7 +323,7 @@
             border-color: #ff1493;
         }
 
-        /* Estilos da tela de seleção de personagem - REVISADOS */
+        /* Estilos da tela de seleção de personagem - REVISADOS E APRIMORADOS */
         #character-select-screen {
             position: absolute;
             top: 0;
@@ -344,8 +338,8 @@
             z-index: 101; /* Acima do wrapper do jogo, abaixo do menu principal */
             border-radius: 25px;
             text-align: center;
-            padding: 20px; /* Adicionado padding para evitar que o conteúdo encoste nas bordas */
-            box-sizing: border-box; /* Inclui padding na largura/altura total */
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         #character-select-screen h2 {
@@ -363,9 +357,10 @@
             justify-content: space-around; /* Espaçamento igual entre os personagens */
             align-items: flex-end; /* Alinha os personagens pela base */
             width: 100%;
-            max-width: 800px; /* Limita a largura para desktop */
+            max-width: 900px; /* Aumentado para dar mais espaço aos personagens grandes */
             margin-bottom: 50px;
             flex-wrap: nowrap; /* Impede que os cards quebrem em linha em telas maiores */
+            height: 60%; /* Dá mais altura para os personagens */
         }
 
         .character-card {
@@ -376,11 +371,12 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s ease, filter 0.2s ease;
+            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease; /* Adicionado opacity para efeito de seleção */
             box-shadow: none; /* Sem sombra na carta */
-            position: relative; /* Para posicionar o botão */
+            position: relative;
             flex: 1; /* Ocupa espaço igual */
-            max-width: 45%; /* Limita a largura de cada personagem */
+            max-width: 48%; /* Limita a largura de cada personagem */
+            justify-content: flex-end; /* Alinha o conteúdo ao fundo do card */
         }
 
         .character-card:hover {
@@ -388,13 +384,29 @@
             filter: brightness(1.1); /* Brilho no hover */
         }
 
+        /* Efeito de personagem selecionado */
+        .character-card.selected {
+            filter: brightness(1.2) drop-shadow(0 0 20px #ff69b4); /* Brilho e sombra rosa forte */
+            transform: translateY(-20px) scale(1.05); /* Mais destaque */
+            opacity: 1;
+        }
+
+        .character-card:not(.selected) {
+            opacity: 0.7; /* Diminui opacidade dos não selecionados */
+        }
+        .character-card:not(.selected):hover {
+            opacity: 1; /* Volta a opacidade no hover */
+        }
+
+
         .character-card img {
             width: 100%; /* Imagem ocupa 100% da largura do card */
             height: auto; /* Mantém proporção */
+            max-height: 100%; /* Garante que a imagem não transborde o container */
             object-fit: contain;
             margin-bottom: 15px;
-            border-radius: 0; /* REMOVIDO: border-radius para não ter moldura */
-            border: none; /* REMOVIDO: borda para não ter moldura */
+            border-radius: 0;
+            border: none;
             filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.7)); /* Sombra para destacar a imagem */
         }
 
@@ -407,7 +419,9 @@
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
         }
 
-        .select-character-button {
+        /* Botão de seleção removido, a seleção é feita no card.
+           Este estilo é apenas para o botão "Iniciar Jogo" que aparecerá depois. */
+        .select-character-button { /* Renomeado para iniciar-jogo-button para clareza */
             padding: 15px 30px;
             font-size: 1.5em;
             background: linear-gradient(145deg, #ff1493, #ff69b4);
@@ -419,15 +433,12 @@
             transition: all 0.2s ease;
             text-transform: uppercase;
             font-weight: bold;
-            position: absolute; /* Posiciona o botão de seleção */
-            bottom: -50px; /* Ajusta a posição para fora do card */
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap; /* Evita que o texto quebre */
+            margin-top: 50px; /* Margem para separar do container de personagens */
+            display: none; /* Escondido por padrão, só aparece após seleção */
         }
 
         .select-character-button:hover {
-            transform: translateY(-55px) translateX(-50%); /* Move o botão junto com o card */
+            transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
@@ -435,6 +446,7 @@
         /* Ajustes responsivos para telas menores (tablets) */
         @media (max-width: 768px) {
             #game-container {
+                width: 95%;
                 height: 90vh; /* Ajuste para tablets */
             }
             #start-screen h1 {
@@ -456,10 +468,6 @@
             .rola {
                 width: 80px;
                 height: 80px;
-            }
-            .large-rola {
-                width: 110px;
-                height: 110px;
             }
             .penalty-object {
                 width: 80px;
@@ -496,14 +504,15 @@
                 margin-bottom: 40px;
             }
             .character-selection-container {
-                gap: 20px; /* Reduzido o gap */
+                gap: 20px;
+                height: 50%; /* Ajusta altura do container de seleção */
             }
             .character-card {
-                max-width: 48%; /* Ajusta a largura para 2 colunas */
+                max-width: 48%;
             }
             .character-card img {
-                width: 150px; /* Ajustado */
-                height: 150px; /* Ajustado */
+                width: 100%; /* Ajustado para preencher o card */
+                max-height: 100%;
             }
             .character-card h3 {
                 font-size: 1.5em;
@@ -511,10 +520,7 @@
             .select-character-button {
                 padding: 12px 25px;
                 font-size: 1.2em;
-                bottom: -40px; /* Ajusta a posição do botão */
-            }
-            .select-character-button:hover {
-                transform: translateY(-45px) translateX(-50%);
+                margin-top: 30px;
             }
         }
 
@@ -548,10 +554,6 @@
             .rola {
                 width: 50px;
                 height: 50px;
-            }
-            .large-rola {
-                width: 80px;
-                height: 80px;
             }
             .penalty-object {
                 width: 50px;
@@ -590,12 +592,12 @@
             }
             .character-selection-container {
                 flex-direction: column; /* Empilha os cards verticalmente */
-                gap: 20px; /* Ajustado */
-                max-width: 90%; /* Ocupa mais largura */
+                gap: 20px;
+                height: auto; /* Altura automática */
             }
             .character-card {
                 width: 100%; /* Ocupa a largura total na coluna */
-                max-width: 300px; /* Limite para não ficar gigante em telas muito largas no modo coluna */
+                max-width: 250px; /* Limite para não ficar gigante em telas muito largas no modo coluna */
                 margin-bottom: 40px; /* Mais espaço entre os cards empilhados */
             }
             .character-card img {
@@ -608,10 +610,7 @@
             .select-character-button {
                 padding: 10px 20px;
                 font-size: 1em;
-                bottom: -30px; /* Ajusta a posição do botão */
-            }
-            .select-character-button:hover {
-                transform: translateY(-35px) translateX(-50%);
+                margin-top: 20px;
             }
         }
     </style>
@@ -632,14 +631,14 @@
                 <div class="character-card" data-character-id="carlinha">
                     <img src="https://files.catbox.moe/xyhrnx.png" alt="Carlinha Catatau">
                     <h3>Carlinha Catatau</h3>
-                    <button class="select-character-button">Escolher Carlinha</button>
                 </div>
                 <div class="character-card" data-character-id="eduardo">
                     <img src="https://files.catbox.moe/fvn4j3.png" alt="Eduardo Vício Pinto">
                     <h3>Eduardo Vício Pinto</h3>
-                    <button class="select-character-button">Escolher Eduardo</button>
                 </div>
             </div>
+            <!-- Botão para iniciar o jogo após a seleção (aparece via JS) -->
+            <button id="start-game-after-character-select" class="select-character-button">Iniciar Jogo</button>
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -686,7 +685,8 @@
 
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
-        const selectCharacterButtons = document.querySelectorAll('.select-character-button');
+        const characterCards = document.querySelectorAll('.character-card'); // Seleciona os cards
+        const startGameAfterCharacterSelectButton = document.getElementById('start-game-after-character-select'); // Novo botão
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
@@ -699,12 +699,9 @@
             'https://files.catbox.moe/qkukmd.png'  // Rola 3
             // REMOVIDO: 'https://files.catbox.moe/b9dyhd.png' da lista de rolas
         ];
-        // Nova URL para a "Rola 2" se ela for ser um tipo de objeto diferente ou grande.
-        // Se ela não for mais uma rola, não precisa estar aqui.
-        const LARGE_ROLA_IMAGE_URL = 'https://files.catbox.moe/b9dyhd.png'; // Mantida como uma rola grande separada
         const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // Imagem de penalidade
 
-        // Dados dos Personagens - CORRIGIDO AS IMAGENS DE BOCA ABERTA/FECHADA E DE SELEÇÃO
+        // Dados dos Personagens - CORRIGIDO E VERIFICADO
         const characterData = {
             'carlinha': {
                 name: 'Carlinha Catatau',
@@ -721,8 +718,11 @@
         };
 
         // Variáveis para as imagens do personagem atualmente selecionado
-        let currentCharacterMouthOpenImage;
-        let currentCharacterMouthClosedImage;
+        let currentCharacterMouthOpenImage = characterData.carlinha.openMouthImage; // Default para evitar erro inicial
+        let currentCharacterMouthClosedImage = characterData.carlinha.closedMouthImage; // Default
+
+        // Variável para armazenar o ID do personagem selecionado
+        let selectedCharacterId = null;
 
         // --- Variáveis de Jogo ---
         let score = 0;
@@ -806,10 +806,15 @@
             startScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             audioToggleButton.style.display = 'none'; // Esconde o botão de áudio na seleção de personagem
-            
+            startGameAfterCharacterSelectButton.style.display = 'none'; // Esconde o botão de iniciar jogo inicialmente
+
             // Atualiza as imagens dos personagens na tela de seleção
             document.querySelector('.character-card[data-character-id="carlinha"] img').src = characterData.carlinha.selectionImage;
             document.querySelector('.character-card[data-character-id="eduardo"] img').src = characterData.eduardo.selectionImage;
+            
+            // Remove a classe 'selected' de todos os cards
+            characterCards.forEach(card => card.classList.remove('selected'));
+            selectedCharacterId = null; // Reseta a seleção
         }
 
         function showCaiRolaGameScreen() {
@@ -821,6 +826,12 @@
         // --- Início e Loop do Jogo "CAI ROLA" ---
 
         function startCaiRolaGame() {
+            if (!selectedCharacterId) {
+                // Isso não deve acontecer se o fluxo for seguido, mas é uma segurança
+                alert('Por favor, selecione um personagem primeiro!');
+                return;
+            }
+
             score = 0; // Reseta a pontuação
             lives = 3; // Reseta as vidas
             scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
@@ -865,21 +876,36 @@
         startButton.addEventListener('click', startCaiRolaGame);
         restartButton.addEventListener('click', startCaiRolaGame);
 
-        // Event Listeners para os botões de seleção de personagem
-        selectCharacterButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const characterId = event.target.closest('.character-card').dataset.characterId;
-                const selectedChar = characterData[characterId];
+        // Event Listeners para os CARDS de seleção de personagem
+        characterCards.forEach(card => {
+            card.addEventListener('click', (event) => {
+                // Remove a classe 'selected' de todos os cards
+                characterCards.forEach(c => c.classList.remove('selected'));
+                // Adiciona a classe 'selected' ao card clicado
+                card.classList.add('selected');
+
+                selectedCharacterId = card.dataset.characterId;
+                const selectedChar = characterData[selectedCharacterId];
                 
                 // Define as imagens do personagem selecionado para uso no jogo
                 currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
                 currentCharacterMouthOpenImage = selectedChar.openMouthImage;
 
-                // CORREÇÃO: Transiciona para a tela de início do jogo ANTES de iniciar o gameLoop
-                showCaiRolaGameScreen(); 
-                startCaiRolaGame(); // Inicia o jogo com o personagem selecionado
+                // Mostra o botão "Iniciar Jogo" após a seleção
+                startGameAfterCharacterSelectButton.style.display = 'block';
             });
         });
+
+        // Event listener para o novo botão "Iniciar Jogo" após a seleção de personagem
+        startGameAfterCharacterSelectButton.addEventListener('click', () => {
+            if (selectedCharacterId) {
+                showCaiRolaGameScreen(); // Transiciona para a tela de início do jogo
+                startCaiRolaGame(); // Inicia o jogo com o personagem selecionado
+            } else {
+                alert('Por favor, selecione um personagem para iniciar o jogo!');
+            }
+        });
+
 
         // --- Controle de Áudio de Fundo ---
         audioToggleButton.addEventListener('click', () => {
@@ -943,30 +969,24 @@
             const obj = document.createElement('div'); // Cria um novo elemento div
 
             // Decide aleatoriamente se será uma "rola" ou um "objeto de penalidade"
-            // Aumenta a chance de ser penalidade para 25% para mais desafio
-            const isPenalty = Math.random() < 0.25; 
+            const isPenalty = Math.random() < 0.25; // 25% de chance de ser um objeto de penalidade
 
             if (isPenalty) {
                 obj.classList.add('penalty-object'); // Adiciona a classe para estilos de penalidade
                 obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`;
             } else {
-                // Escolhe uma rola aleatoriamente, incluindo a rola grande
-                const allRolaImages = [...ROLA_IMAGES, LARGE_ROLA_IMAGE_URL]; // Inclui a rola grande na seleção
-                const rolaImageIndex = Math.floor(Math.random() * allRolaImages.length);
-                const selectedRolaImage = allRolaImages[rolaImageIndex];
+                // Escolhe uma rola aleatoriamente (agora sem a "Rola 2" grande)
+                const rolaImageIndex = Math.floor(Math.random() * ROLA_IMAGES.length);
+                const selectedRolaImage = ROLA_IMAGES[rolaImageIndex];
                 
                 obj.classList.add('rola'); // Adiciona a classe 'rola' para aplicar os estilos CSS
                 obj.style.backgroundImage = `url(${selectedRolaImage})`;
-
-                // Se for a "Rola 2" (LARGE_ROLA_IMAGE_URL), adiciona a classe para torná-la maior
-                if (selectedRolaImage === LARGE_ROLA_IMAGE_URL) {
-                    obj.classList.add('large-rola');
-                }
+                // REMOVIDO: Lógica da large-rola, pois a imagem foi removida do array de rolas
             }
 
             // Largura do objeto (usa o valor do CSS ou padrão)
-            // Se for uma large-rola, usa o tamanho da large-rola, senão usa o tamanho padrão
-            const objWidth = obj.classList.contains('large-rola') ? (obj.offsetWidth || 130) : (obj.offsetWidth || 100);
+            // Agora, todos os objetos "rola" terão o mesmo tamanho padrão
+            const objWidth = obj.offsetWidth || 100;
             
             // Define uma posição X inicial aleatória para o objeto
             obj.x = Math.random() * (gameContainer.offsetWidth - objWidth);
@@ -992,7 +1012,7 @@
             const gameContainerHeight = gameContainer.offsetHeight;
             const characterHeight = character.offsetHeight;
             const characterWidth = character.offsetWidth;
-            const characterBottom = gameContainerHeight - 20; // AJUSTADO: Posição inferior do personagem (mesmo valor do CSS)
+            const characterBottom = gameContainerHeight - 80; // AJUSTADO: Posição inferior do personagem (mesmo valor do CSS)
             const characterTop = characterBottom - characterHeight; // Posição superior do personagem
 
             // Distância para a boca abrir antes da colisão (ajustado para o efeito de "camadas")
@@ -1006,9 +1026,9 @@
                 obj.y += obj.speed; // Atualiza a posição Y do objeto (faz ele cair)
                 obj.style.top = `${obj.y}px`; // Atualiza a posição do objeto no DOM
 
-                // Obtém as dimensões e posições do objeto
-                const objWidth = obj.classList.contains('large-rola') ? (obj.offsetWidth || 130) : (obj.offsetWidth || 100);
-                const objHeight = obj.classList.contains('large-rola') ? (obj.offsetHeight || 130) : (obj.offsetHeight || 100);
+                // Obtém as dimensões e posições do objeto (agora todos os rolas têm o mesmo tamanho base)
+                const objWidth = obj.offsetWidth || 100;
+                const objHeight = obj.offsetHeight || 100;
 
                 const objLeft = obj.x;
                 const objRight = obj.x + objWidth;
@@ -1109,8 +1129,8 @@
 
                 // Ajusta a posição dos objetos se eles ficarem fora dos limites horizontais após o redimensionamento
                 rolas.forEach(obj => {
-                    // Usa o tamanho correto do objeto para o cálculo
-                    const objWidth = obj.classList.contains('large-rola') ? (obj.offsetWidth || 130) : (obj.offsetWidth || 100);
+                    // Agora, todos os rolas têm o mesmo tamanho padrão
+                    const objWidth = obj.offsetWidth || 100;
                     if (obj.x + objWidth > gameContainer.offsetWidth) {
                         obj.x = gameContainer.offsetWidth - objWidth;
                         obj.style.left = `${obj.x}px`;
