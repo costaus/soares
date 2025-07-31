@@ -109,18 +109,12 @@
             color: #FFD700;
             text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
             z-index: 10;
+            white-space: nowrap; /* Impede que o texto quebre */
         }
 
-        /* Estilos do display de vidas */
+        /* Estilos do display de vidas (REMOVIDO DO HTML, mas mantendo o estilo caso seja reintroduzido ou para referência) */
         #lives-display {
-            position: absolute;
-            top: 15px; /* AJUSTADO: Mais para cima para não ser cortado */
-            right: 20px; /* AJUSTADO: Mais para dentro */
-            font-size: 3.5em;
-            font-weight: bold;
-            color: #FFD700;
-            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
-            z-index: 10;
+            display: none; /* Garante que não seja visível */
         }
 
         /* Estilos do personagem principal */
@@ -457,11 +451,14 @@
                 padding: 18px 35px;
                 font-size: 1.8em;
             }
-            #score-display, #lives-display {
+            #score-display {
                 font-size: 2.2em;
                 top: 20px; /* AJUSTADO: Mais para baixo para tablets */
                 left: 15px; /* AJUSTADO */
-                right: 15px; /* AJUSTADO */
+                right: auto; /* Garante que não haja conflito com 'right' */
+            }
+            #lives-display { /* Mantendo o estilo para referência, mas display: none */
+                display: none;
             }
             #character {
                 width: 140px; /* AJUSTADO: Ligeiramente maior para tablets */
@@ -542,13 +539,12 @@
             }
             #score-display {
                 font-size: 1.2em;
-                top: 10px; /* AJUSTADO: Mais para baixo para smartphones */
+                top: 10px; /* AJUSTADO: Mais para cima para smartphones */
                 left: 10px;
+                right: auto; /* Garante que não haja conflito com 'right' */
             }
-            #lives-display {
-                font-size: 1.2em;
-                top: 10px; /* AJUSTADO: Mais para baixo para smartphones */
-                right: 10px;
+            #lives-display { /* Mantendo o estilo para referência, mas display: none */
+                display: none;
             }
             #character {
                 width: 100px; /* AJUSTADO: Ligeiramente maior para smartphones */
@@ -653,8 +649,8 @@
             </div>
             <!-- Display de pontuação -->
             <div id="score-display">Rolas: 0</div>
-            <!-- Display de vidas -->
-            <div id="lives-display">Vidas: 3</div>
+            <!-- Display de vidas (REMOVIDO) -->
+            <!-- <div id="lives-display">Vidas: 3</div> --> 
             <!-- Personagem principal -->
             <div id="character"></div>
             <!-- Tela de Fim de Jogo -->
@@ -673,7 +669,7 @@
         const gameContainer = document.getElementById('game-container');
         const character = document.getElementById('character');
         const scoreDisplay = document.getElementById('score-display');
-        const livesDisplay = document.getElementById('lives-display');
+        // REMOVIDO: const livesDisplay = document.getElementById('lives-display');
         const startScreen = document.getElementById('start-screen'); // Tela de início do Cai Rola
         const startButton = document.getElementById('start-button');
         const gameOverScreen = document.getElementById('game-over-screen');
@@ -692,7 +688,6 @@
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
-        // REMOVIDO: backgroundMusic = new Audio(); // Esta variável não será mais usada como música de fundo separada
         let collectSound = new Audio('https://files.catbox.moe/qegrfu.mp3'); // Áudio para o som de coleta
 
         // Variável de controle global para o áudio
@@ -702,7 +697,6 @@
         const ROLA_IMAGES = [
             'https://files.catbox.moe/n39c1e.png', // Rola 1
             'https://files.catbox.moe/qkukmd.png'  // Rola 3
-            // REMOVIDO: 'https://files.catbox.moe/b9dyhd.png' da lista de rolas
         ];
         const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // Imagem de penalidade
 
@@ -731,7 +725,7 @@
 
         // --- Variáveis de Jogo ---
         let score = 0;
-        let lives = 3;
+        // REMOVIDO: let lives = 3;
         let characterX = 0;
         let rolas = []; // Array para armazenar os objetos caindo (incluindo penalidades)
         let rolaGenerationInterval;
@@ -802,7 +796,6 @@
             gameOverScreen.style.display = 'none';
             startScreen.style.display = 'none';
             audioToggleButton.style.display = 'none'; // Esconde o botão de áudio no menu
-            // REMOVIDO: backgroundMusic.pause(); // Não há mais música de fundo separada
             audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
             isSoundEnabled = false; // Desativa o som ao voltar para o menu principal
         }
@@ -840,9 +833,9 @@
             }
 
             score = 0; // Reseta a pontuação
-            lives = 3; // Reseta as vidas
+            // REMOVIDO: lives = 3;
             scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
-            livesDisplay.textContent = `Vidas: ${lives}`; // Atualiza o display de vidas
+            // REMOVIDO: livesDisplay.textContent = `Vidas: ${lives}`;
             rolas = []; // Limpa quaisquer objetos existentes
             // Remove todos os elementos .rola e .penalty-object do DOM, caso existam de uma partida anterior
             document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
@@ -904,7 +897,6 @@
             isSoundEnabled = !isSoundEnabled; // Inverte o estado do som
             if (isSoundEnabled) {
                 audioToggleButton.textContent = 'Gemidos: ON';
-                // Não há música de fundo para tocar aqui, apenas os efeitos serão ativados
             } else {
                 audioToggleButton.textContent = 'Gemidos: OFF';
                 // Pausa qualquer som de coleta que esteja tocando
@@ -1061,14 +1053,13 @@
                         playCollectSound(); // Toca o som de coleta
                     } else if (obj.classList.contains('penalty-object')) {
                         score -= 30; // Diminui a pontuação em 30
-                        lives--; // Perde 1 vida
-                        livesDisplay.textContent = `Vidas: ${lives}`; // Atualiza o display de vidas
+                        // REMOVIDO: lives--;
+                        // REMOVIDO: livesDisplay.textContent = `Vidas: ${lives}`;
                         playPenaltySound(); // Toca o som de penalidade
 
-                        if (lives <= 0) {
-                            endGame(); // Chama a função de fim de jogo se as vidas acabarem
-                            return; // Sai do loop para evitar processamento adicional
-                        }
+                        // Fim de jogo imediato ao coletar penalidade
+                        endGame(); 
+                        return; // Sai do loop para evitar processamento adicional
                     }
                     scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
                     obj.remove(); // Remove o objeto do DOM
@@ -1104,7 +1095,6 @@
 
             finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`; // Exibe a pontuação final
             gameOverScreen.style.display = 'flex'; // Mostra a tela de fim de jogo
-            // REMOVIDO: backgroundMusic.pause(); // Não há mais música de fundo separada
             audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
             isSoundEnabled = false; // Desativa o som ao terminar o jogo
         }
