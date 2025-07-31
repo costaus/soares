@@ -530,7 +530,8 @@
             if (Tone.context.state !== 'running') {
                 Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
             }
-            penaltySynth.triggerAttackRelease(["F3", "C#3"], "0.5"); // Toca um acorde dissonante por 0.5 segundos
+            // CORREÇÃO: Simplificado para uma única nota para evitar travamentos
+            penaltySynth.triggerAttackRelease("C3", "0.5"); // Toca uma nota C3 por 0.5 segundos
         }
 
         // --- Funções de Inicialização ---
@@ -592,7 +593,10 @@
         });
         picaManButton.addEventListener('click', () => {
             // Nova mensagem para o Pica-Man
-            alert('eu ainda vou termina esse pica man, espera. ass: dan 🤭');
+            // Substituí alert() por uma mensagem na console para evitar bloqueio da UI
+            console.log('eu ainda vou termina esse pica man, espera. ass: dan 🤭');
+            // Você pode implementar uma modal customizada aqui se quiser uma mensagem visível na tela
+            alert('eu ainda vou termina esse pica man, espera. ass: dan 🤭'); // Mantido alert temporariamente para feedback visível
         });
 
         startButton.addEventListener('click', startCaiRolaGame);
