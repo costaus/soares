@@ -28,7 +28,7 @@
             position: relative;
             width: 95%; /* Largura responsiva, maior para celular */
             max-width: 900px; /* Largura máxima para tablets/desktops */
-            height: 900px; /* Altura da área do jogo AUMENTADA */
+            height: 90vh; /* Altura responsiva para caber na tela */
             background-color: #333; /* Fundo escuro para o jogo */
             border-radius: 30px; /* Cantos mais arredondados */
             overflow: hidden; /* Importante para que os objetos caindo não saiam da área visível */
@@ -366,7 +366,7 @@
 
         .character-card {
             background-color: rgba(50, 50, 50, 0.7);
-            border: 5px solid #ff69b4;
+            border: 5px solid #ff69b4; /* Borda da carta, não da imagem */
             border-radius: 20px;
             padding: 25px;
             display: flex;
@@ -387,8 +387,8 @@
             height: 180px;
             object-fit: contain;
             margin-bottom: 15px;
-            border-radius: 10px;
-            border: 2px solid #FFD700;
+            border-radius: 0; /* REMOVIDO: border-radius para não ter moldura */
+            border: none; /* REMOVIDO: borda para não ter moldura */
         }
 
         .character-card h3 {
@@ -423,7 +423,7 @@
         @media (max-width: 768px) {
             #game-container {
                 width: 95%;
-                height: 80vh; /* Altura responsiva para tablets */
+                height: 90vh; /* Ajuste para tablets */
             }
             #start-screen h1 {
                 font-size: 3.5em;
@@ -505,91 +505,91 @@
         /* Ajustes responsivos para telas muito pequenas (smartphones) */
         @media (max-width: 480px) {
             #game-container {
-                height: 85vh; /* Altura responsiva para smartphones */
+                height: 95vh; /* Ajuste mais agressivo para smartphones */
                 border-radius: 20px;
             }
             #start-screen h1 {
-                font-size: 2.8em;
+                font-size: 2.5em; /* Reduzido mais */
             }
             #start-button {
-                padding: 12px 25px;
-                font-size: 1.5em;
+                padding: 10px 20px; /* Reduzido mais */
+                font-size: 1.2em; /* Reduzido mais */
             }
             #score-display {
-                font-size: 1.5em; /* Fonte menor para caber na tela */
-                top: 15px;
-                left: 15px;
+                font-size: 1.2em; /* Fonte menor para caber na tela */
+                top: 10px; /* Ajuste de posição */
+                left: 10px; /* Ajuste de posição */
             }
             #lives-display {
-                font-size: 1.5em; /* Fonte menor para caber na tela */
-                top: 15px;
-                right: 15px;
+                font-size: 1.2em; /* Fonte menor para caber na tela */
+                top: 10px; /* Ajuste de posição */
+                right: 10px; /* Ajuste de posição */
             }
             #character {
-                width: 90px; /* Reduzido para smartphones */
-                height: 90px; /* Reduzido para smartphones */
-                bottom: 30px;
+                width: 80px; /* Reduzido para smartphones */
+                height: 80px; /* Reduzido para smartphones */
+                bottom: 25px; /* Ajustado */
             }
             .rola {
-                width: 60px; /* Reduzido para smartphones */
-                height: 60px; /* Reduzido para smartphones */
+                width: 50px; /* Reduzido para smartphones */
+                height: 50px; /* Reduzido para smartphones */
             }
             .large-rola {
-                width: 90px; /* Rola 2 maior para smartphones */
-                height: 90px;
+                width: 80px; /* Rola 2 maior para smartphones */
+                height: 80px;
             }
             .penalty-object {
-                width: 60px; /* Reduzido para smartphones */
-                height: 60px; /* Reduzido para smartphones */
+                width: 50px; /* Reduzido para smartphones */
+                height: 50px; /* Reduzido para smartphones */
             }
             #game-over-screen h2 {
-                font-size: 2.5em;
+                font-size: 2em;
             }
             #game-over-screen p {
-                font-size: 1.2em;
+                font-size: 1em;
             }
             #restart-button {
-                padding: 10px 20px;
-                font-size: 1.2em;
+                padding: 8px 15px;
+                font-size: 1em;
             }
             /* Menu Principal Responsivo para Smartphones */
             #main-menu h1 {
-                font-size: 2.8em;
-                margin-bottom: 40px;
+                font-size: 2.2em; /* Reduzido mais */
+                margin-bottom: 30px; /* Reduzido mais */
             }
             .menu-button {
-                padding: 15px 35px;
-                font-size: 1.8em;
-                min-width: 250px;
-                margin: 15px;
+                padding: 12px 25px; /* Reduzido mais */
+                font-size: 1.5em; /* Reduzido mais */
+                min-width: 200px; /* Ajustado */
+                margin: 10px; /* Reduzido mais */
             }
             #audio-toggle-button {
-                font-size: 0.9em;
-                padding: 6px 12px;
+                font-size: 0.8em;
+                padding: 5px 10px;
+                bottom: 10px;
             }
             /* Seleção de Personagem Responsiva para Smartphones */
             #character-select-screen h2 {
-                font-size: 2.8em;
-                margin-bottom: 30px;
+                font-size: 2.2em;
+                margin-bottom: 20px;
             }
             .character-selection-container {
-                flex-direction: column; /* Empilha os cards verticalmente */
-                gap: 20px;
+                gap: 15px;
             }
             .character-card {
-                padding: 15px;
-                width: 80%; /* Ocupa mais largura */
+                padding: 10px;
+                width: 90%; /* Ocupa mais largura */
             }
             .character-card img {
-                width: 120px;
-                height: 120px;
+                width: 100px; /* Reduzido */
+                height: 100px; /* Reduzido */
             }
             .character-card h3 {
-                font-size: 1.2em;
+                font-size: 1em;
             }
             .select-character-button {
-                padding: 10px 20px;
-                font-size: 1em;
+                padding: 8px 15px;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -769,9 +769,9 @@
             characterSelectScreen.style.display = 'none'; // Esconde tela de seleção
             gameOverScreen.style.display = 'none';
             startScreen.style.display = 'none';
-            audioToggleButton.style.display = 'none';
-            backgroundMusic.pause();
-            audioToggleButton.textContent = 'Música: OFF';
+            audioToggleButton.style.display = 'none'; // Esconde o botão de áudio no menu
+            backgroundMusic.pause(); // Pausa a música ao voltar para o menu
+            audioToggleButton.textContent = 'Música: OFF'; // Reseta o texto do botão
         }
 
         function showCharacterSelectScreen() {
@@ -800,7 +800,9 @@
             // Remove todos os elementos .rola e .penalty-object do DOM, caso existam de uma partida anterior
             document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
 
-            showCaiRolaGameScreen(); // Transiciona para a tela de início do jogo
+            // CORREÇÃO CRÍTICA: Esconde a tela de início imediatamente antes de iniciar o loop
+            startScreen.style.display = 'none'; 
+            
             gameRunning = true; // Define o estado do jogo como rodando
             gameOver = false; // Reseta o estado de fim de jogo
             initializeCharacterPosition(); // Garante que o personagem esteja no centro com a imagem correta
@@ -844,6 +846,8 @@
                 currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
                 currentCharacterMouthOpenImage = selectedChar.openMouthImage;
 
+                // CORREÇÃO: Transiciona para a tela de início do jogo ANTES de iniciar o gameLoop
+                showCaiRolaGameScreen(); 
                 startCaiRolaGame(); // Inicia o jogo com o personagem selecionado
             });
         });
@@ -910,8 +914,7 @@
             const obj = document.createElement('div'); // Cria um novo elemento div
 
             // Decide aleatoriamente se será uma "rola" ou um "objeto de penalidade"
-            // Aumenta a chance de ser penalidade para 25% para mais desafio
-            const isPenalty = Math.random() < 0.25; 
+            const isPenalty = Math.random() < 0.25; // 25% de chance de ser um objeto de penalidade
 
             if (isPenalty) {
                 obj.classList.add('penalty-object'); // Adiciona a classe para estilos de penalidade
@@ -1069,7 +1072,8 @@
 
         // Lida com o redimensionamento da janela para manter o jogo responsivo
         window.addEventListener('resize', () => {
-            if (gameRunning) { // Apenas recalcula se o jogo estiver rodando
+            // Apenas recalcula se o jogo estiver rodando ou em uma tela de menu/seleção
+            if (gameRunning || mainMenu.style.display === 'flex' || characterSelectScreen.style.display === 'flex') {
                 initializeCharacterPosition(); // Recalcula a posição do personagem
 
                 // Ajusta a posição dos objetos se eles ficarem fora dos limites horizontais após o redimensionamento
