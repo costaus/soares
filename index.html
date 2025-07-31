@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comedor de Rolas</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- Tone.js para geração de áudio -->
+    <!-- Tone.js para geração de áudio (mantido para os sons de penalidade) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <style>
         /* Estilos gerais do corpo da página */
@@ -159,6 +159,12 @@
             animation: rotate 3s linear infinite; /* Animação de rotação mais lenta */
         }
 
+        /* Estilos para a "Rola 2" (maior) */
+        .large-rola {
+            width: 130px; /* Rola 2 maior */
+            height: 130px; /* Rola 2 maior */
+        }
+
         /* Estilos para o novo objeto de penalidade */
         .penalty-object {
             position: absolute;
@@ -234,7 +240,7 @@
         #restart-button:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            background: linear-gradient(145deg, #ff69b4, #ff1493); /* Inverte o gradiente no hover */
         }
 
         /* Estilos da tela de seleção de jogo (Menu Principal) - REVISADOS */
@@ -300,6 +306,119 @@
             height: 100%;
         }
 
+        /* Botão de áudio */
+        #audio-toggle-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            cursor: pointer;
+            z-index: 10; /* Acima do game-container */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            display: none; /* Escondido por padrão, só aparece no jogo */
+        }
+
+        #audio-toggle-button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            border-color: #ff1493;
+        }
+
+        /* Estilos da tela de seleção de personagem */
+        #character-select-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
+            display: none; /* Escondido por padrão */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 101; /* Acima do wrapper do jogo, abaixo do menu principal */
+            border-radius: 25px;
+            text-align: center;
+        }
+
+        #character-select-screen h2 {
+            font-size: 4em;
+            margin-bottom: 50px;
+            color: #FFD700;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        .character-selection-container {
+            display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas menores */
+            justify-content: center;
+            gap: 40px; /* Espaço entre os personagens */
+            margin-bottom: 50px;
+        }
+
+        .character-card {
+            background-color: rgba(50, 50, 50, 0.7);
+            border: 5px solid #ff69b4;
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .character-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .character-card img {
+            width: 180px; /* Tamanho da imagem do personagem na seleção */
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+        }
+
+        .character-card h3 {
+            font-size: 1.8em;
+            color: white;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .select-character-button {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .select-character-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+        }
+
         /* Ajustes responsivos para telas menores (tablets) */
         @media (max-width: 768px) {
             #game-container {
@@ -322,7 +441,15 @@
                 height: 120px; /* Reduzido para tablets */
                 bottom: 50px;
             }
-            .rola, .penalty-object {
+            .rola {
+                width: 80px; /* Reduzido para tablets */
+                height: 80px; /* Reduzido para tablets */
+            }
+            .large-rola {
+                width: 110px; /* Rola 2 maior para tablets */
+                height: 110px;
+            }
+            .penalty-object {
                 width: 80px; /* Reduzido para tablets */
                 height: 80px; /* Reduzido para tablets */
             }
@@ -346,6 +473,32 @@
                 font-size: 2.2em;
                 min-width: 300px;
                 margin: 20px;
+            }
+            #audio-toggle-button {
+                font-size: 1em;
+                padding: 8px 15px;
+            }
+            /* Seleção de Personagem Responsiva para Tablets */
+            #character-select-screen h2 {
+                font-size: 3.5em;
+                margin-bottom: 40px;
+            }
+            .character-selection-container {
+                gap: 30px;
+            }
+            .character-card {
+                padding: 20px;
+            }
+            .character-card img {
+                width: 150px;
+                height: 150px;
+            }
+            .character-card h3 {
+                font-size: 1.5em;
+            }
+            .select-character-button {
+                padding: 12px 25px;
+                font-size: 1.2em;
             }
         }
 
@@ -377,7 +530,15 @@
                 height: 90px; /* Reduzido para smartphones */
                 bottom: 30px;
             }
-            .rola, .penalty-object {
+            .rola {
+                width: 60px; /* Reduzido para smartphones */
+                height: 60px; /* Reduzido para smartphones */
+            }
+            .large-rola {
+                width: 90px; /* Rola 2 maior para smartphones */
+                height: 90px;
+            }
+            .penalty-object {
                 width: 60px; /* Reduzido para smartphones */
                 height: 60px; /* Reduzido para smartphones */
             }
@@ -402,6 +563,34 @@
                 min-width: 250px;
                 margin: 15px;
             }
+            #audio-toggle-button {
+                font-size: 0.9em;
+                padding: 6px 12px;
+            }
+            /* Seleção de Personagem Responsiva para Smartphones */
+            #character-select-screen h2 {
+                font-size: 2.8em;
+                margin-bottom: 30px;
+            }
+            .character-selection-container {
+                flex-direction: column; /* Empilha os cards verticalmente */
+                gap: 20px;
+            }
+            .character-card {
+                padding: 15px;
+                width: 80%; /* Ocupa mais largura */
+            }
+            .character-card img {
+                width: 120px;
+                height: 120px;
+            }
+            .character-card h3 {
+                font-size: 1.2em;
+            }
+            .select-character-button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -412,6 +601,23 @@
             <h1>Escolha seu Jogo</h1>
             <button id="cai-rola-button" class="menu-button">CAI ROLA</button>
             <button id="pica-man-button" class="menu-button">PICA-MAN (Em Breve)</button>
+        </div>
+
+        <!-- Tela de Seleção de Personagem -->
+        <div id="character-select-screen">
+            <h2>Escolha seu Personagem</h2>
+            <div class="character-selection-container">
+                <div class="character-card" data-character-id="carlinha">
+                    <img src="https://files.catbox.moe/xyhrnx.png" alt="Carlinha Catatau">
+                    <h3>Carlinha Catatau</h3>
+                    <button class="select-character-button">Escolher Carlinha</button>
+                </div>
+                <div class="character-card" data-character-id="eduardo">
+                    <img src="https://files.catbox.moe/fvn4j3.png" alt="Eduardo Vício Pinto">
+                    <h3>Eduardo Vício Pinto</h3>
+                    <button class="select-character-button">Escolher Eduardo</button>
+                </div>
+            </div>
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -433,6 +639,8 @@
                 <p id="final-score">Sua Pontuação Final: 0</p>
                 <button id="restart-button">Jogar Novamente</button>
             </div>
+             <!-- Botão de controle de áudio de fundo -->
+            <button id="audio-toggle-button">Música: OFF</button>
         </div>
     </div>
 
@@ -454,15 +662,42 @@
         const picaManButton = document.getElementById('pica-man-button');
         const caiRolaGameWrapper = document.getElementById('cai-rola-game-wrapper');
 
+        // Elementos da Tela de Seleção de Personagem
+        const characterSelectScreen = document.getElementById('character-select-screen');
+        const selectCharacterButtons = document.querySelectorAll('.select-character-button');
+
+        // Elementos de áudio
+        const audioToggleButton = document.getElementById('audio-toggle-button');
+        let backgroundMusic = new Audio(); // Objeto Audio para música de fundo
+        let collectSound = new Audio('https://files.catbox.moe/qegrfu.mp3'); // Áudio para o som de coleta
+
         // --- URLs das Imagens ---
         const ROLA_IMAGES = [
             'https://files.catbox.moe/n39c1e.png', // Rola 1
+            'https://files.catbox.moe/b9dyhd.png', // Rola 2 (agora maior)
             'https://files.catbox.moe/qkukmd.png'  // Rola 3
         ];
-        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // NOVA IMAGEM DE PENALIDADE
+        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // Imagem de penalidade
 
-        const CHARACTER_MOUTH_OPEN_IMAGE = 'https://files.catbox.moe/5dz13l.png';
-        const CHARACTER_MOUTH_CLOSED_IMAGE = 'https://files.catbox.moe/hjspq9.png';
+        // Dados dos Personagens
+        const characterData = {
+            'carlinha': {
+                name: 'Carlinha Catatau',
+                closedMouthImage: 'https://files.catbox.moe/xyhrnx.png',
+                // Para Carlinha, usaremos a mesma imagem para boca aberta/fechada, ou você pode fornecer uma específica.
+                // Para um efeito de boca aberta, o z-index e o "salto" ainda funcionarão.
+                openMouthImage: 'https://files.catbox.moe/xyhrnx.png'
+            },
+            'eduardo': {
+                name: 'Eduardo Vício Pinto',
+                closedMouthImage: 'https://files.catbox.moe/yxm4j5.png', // Nova boca fechada
+                openMouthImage: 'https://files.catbox.moe/olc9ni.png' // Nova boca aberta
+            }
+        };
+
+        // Variáveis para as imagens do personagem atualmente selecionado
+        let currentCharacterMouthOpenImage;
+        let currentCharacterMouthClosedImage;
 
         // --- Variáveis de Jogo ---
         let score = 0;
@@ -478,30 +713,10 @@
         let touchStartX = 0;
         let initialCharacterX = 0;
 
-        // --- Configuração de Áudio com Tone.js ---
-        let collectSynth;
+        // --- Configuração de Áudio com Tone.js (para efeitos sonoros curtos) ---
         let penaltySynth;
 
-        function setupAudio() {
-            // Sintetizador para o som de coleta (gemido suave)
-            collectSynth = new Tone.Synth({
-                oscillator: {
-                    type: "sine"
-                },
-                envelope: {
-                    attack: 0.5, // Ataque suave
-                    decay: 0.1,
-                    sustain: 0.8, // Sustenta o som
-                    release: 0.5 // Liberação suave
-                },
-                volume: -10 // Volume um pouco mais baixo
-            }).toDestination();
-
-            // Adiciona um vibrato sutil
-            const vibrato = new Tone.LFO(2, -0.5, 0.5); // Frequência de 2Hz, profundidade de 0.5 semitons
-            vibrato.connect(collectSynth.detune);
-            vibrato.start();
-
+        function setupAudioEffects() {
             // Sintetizador para o som de penalidade (som mais abrupto/negativo)
             penaltySynth = new Tone.Synth({
                 oscillator: {
@@ -517,26 +732,25 @@
             }).toDestination();
         }
 
-        // Função para tocar o som de coleta
+        // Função para tocar o som de coleta (usando o áudio fornecido)
         function playCollectSound() {
-            if (Tone.context.state !== 'running') {
-                Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
+            if (collectSound.paused) {
+                collectSound.currentTime = 0; // Reinicia o áudio para tocar do início
+                collectSound.play().catch(e => console.log("Erro ao tocar som de coleta:", e));
             }
-            collectSynth.triggerAttackRelease("C4", "0.8"); // Toca uma nota C4 por 0.8 segundos
         }
 
-        // Função para tocar o som de penalidade
+        // Função para tocar o som de penalidade (usando Tone.js)
         function playPenaltySound() {
             if (Tone.context.state !== 'running') {
                 Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
             }
-            // CORREÇÃO: Simplificado para uma única nota para evitar travamentos
             penaltySynth.triggerAttackRelease("C3", "0.5"); // Toca uma nota C3 por 0.5 segundos
         }
 
         // --- Funções de Inicialização ---
 
-        // Função para inicializar a posição do personagem
+        // Função para inicializar a posição do personagem e suas imagens
         function initializeCharacterPosition() {
             if (character.offsetWidth === 0) {
                 setTimeout(initializeCharacterPosition, 50);
@@ -544,22 +758,35 @@
             }
             characterX = (gameContainer.offsetWidth / 2) - (character.offsetWidth / 2);
             character.style.left = `${characterX}px`;
-            character.style.backgroundImage = `url(${CHARACTER_MOUTH_CLOSED_IMAGE})`;
+            // Define a imagem inicial do personagem com base na seleção
+            character.style.backgroundImage = `url(${currentCharacterMouthClosedImage})`;
         }
 
         // --- Gerenciamento de Telas ---
         function showMainMenu() {
             mainMenu.style.display = 'flex';
             caiRolaGameWrapper.style.display = 'none';
+            characterSelectScreen.style.display = 'none'; // Esconde tela de seleção
             gameOverScreen.style.display = 'none';
-            startScreen.style.display = 'none'; // Garante que a tela de início do jogo esteja escondida
+            startScreen.style.display = 'none';
+            audioToggleButton.style.display = 'none';
+            backgroundMusic.pause();
+            audioToggleButton.textContent = 'Música: OFF';
         }
 
-        function showCaiRolaGame() {
+        function showCharacterSelectScreen() {
             mainMenu.style.display = 'none';
-            caiRolaGameWrapper.style.display = 'block'; // Mostra o wrapper do jogo
-            startScreen.style.display = 'flex'; // Mostra a tela de início do jogo Cai Rola
-            gameOverScreen.style.display = 'none'; // Garante que a tela de fim de jogo esteja escondida
+            caiRolaGameWrapper.style.display = 'block'; // O wrapper do jogo precisa estar visível para a tela de seleção
+            characterSelectScreen.style.display = 'flex'; // Mostra a tela de seleção
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            audioToggleButton.style.display = 'none'; // Esconde o botão de áudio na seleção de personagem
+        }
+
+        function showCaiRolaGameScreen() {
+            characterSelectScreen.style.display = 'none'; // Esconde a tela de seleção
+            startScreen.style.display = 'flex'; // Mostra a tela de início do jogo
+            audioToggleButton.style.display = 'block'; // Mostra o botão de áudio no jogo
         }
 
         // --- Início e Loop do Jogo "CAI ROLA" ---
@@ -573,34 +800,64 @@
             // Remove todos os elementos .rola e .penalty-object do DOM, caso existam de uma partida anterior
             document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
 
-            startScreen.style.display = 'none'; // Esconde a tela de início
-            gameOverScreen.style.display = 'none'; // Esconde a tela de fim de jogo
+            showCaiRolaGameScreen(); // Transiciona para a tela de início do jogo
             gameRunning = true; // Define o estado do jogo como rodando
             gameOver = false; // Reseta o estado de fim de jogo
-            initializeCharacterPosition(); // Garante que o personagem esteja no centro
+            initializeCharacterPosition(); // Garante que o personagem esteja no centro com a imagem correta
             gameLoop(); // Inicia o loop principal do jogo
             // Inicia a geração de novos objetos a cada 1200ms (mais lento)
             rolaGenerationInterval = setInterval(createFallingObject, 1200);
+
+            // Tenta tocar a música de fundo ao iniciar o jogo
+            if (!backgroundMusic.src) { // Define a fonte apenas uma vez
+                backgroundMusic.src = 'SEU_LINK_DO_AUDIO_AQUI.mp3'; // *** SUBSTITUA AQUI PELO SEU LINK DA MÚSICA DE FUNDO ***
+                backgroundMusic.loop = true; // Faz a música tocar em loop
+                backgroundMusic.volume = 0.5; // Ajusta o volume (0.0 a 1.0)
+            }
+            backgroundMusic.play().catch(e => console.log("Erro ao tentar tocar a música de fundo:", e));
+            audioToggleButton.textContent = 'Música: ON'; // Atualiza o texto do botão
         }
 
         // --- Event Listeners para Botões ---
         caiRolaButton.addEventListener('click', () => {
-            showCaiRolaGame();
-            // Inicializa o áudio aqui, na primeira interação do usuário
-            if (!collectSynth) { // Garante que o setup seja feito apenas uma vez
-                setupAudio();
+            showCharacterSelectScreen(); // Vai para a tela de seleção de personagem
+            // Inicializa os efeitos de áudio aqui, na primeira interação do usuário
+            if (!penaltySynth) { // Garante que o setup seja feito apenas uma vez
+                setupAudioEffects();
             }
         });
+
         picaManButton.addEventListener('click', () => {
-            // Nova mensagem para o Pica-Man
-            // Substituí alert() por uma mensagem na console para evitar bloqueio da UI
-            console.log('eu ainda vou termina esse pica man, espera. ass: dan 🤭');
-            // Você pode implementar uma modal customizada aqui se quiser uma mensagem visível na tela
-            alert('eu ainda vou termina esse pica man, espera. ass: dan 🤭'); // Mantido alert temporariamente para feedback visível
+            alert('eu ainda vou termina esse pica man, espera. ass: dan 🤭');
         });
 
         startButton.addEventListener('click', startCaiRolaGame);
         restartButton.addEventListener('click', startCaiRolaGame);
+
+        // Event Listeners para os botões de seleção de personagem
+        selectCharacterButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const characterId = event.target.closest('.character-card').dataset.characterId;
+                const selectedChar = characterData[characterId];
+                
+                // Define as imagens do personagem selecionado para uso no jogo
+                currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
+                currentCharacterMouthOpenImage = selectedChar.openMouthImage;
+
+                startCaiRolaGame(); // Inicia o jogo com o personagem selecionado
+            });
+        });
+
+        // --- Controle de Áudio de Fundo ---
+        audioToggleButton.addEventListener('click', () => {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play().catch(e => console.log("Erro ao tentar tocar a música de fundo:", e));
+                audioToggleButton.textContent = 'Música: ON';
+            } else {
+                backgroundMusic.pause();
+                audioToggleButton.textContent = 'Música: OFF';
+            }
+        });
 
         // --- Controles de Teclado (para desktop) ---
         document.addEventListener('keydown', (e) => {
@@ -653,19 +910,30 @@
             const obj = document.createElement('div'); // Cria um novo elemento div
 
             // Decide aleatoriamente se será uma "rola" ou um "objeto de penalidade"
-            const isPenalty = Math.random() < 0.25; // 25% de chance de ser um objeto de penalidade
+            // Aumenta a chance de ser penalidade para 25% para mais desafio
+            const isPenalty = Math.random() < 0.25; 
 
             if (isPenalty) {
                 obj.classList.add('penalty-object'); // Adiciona a classe para estilos de penalidade
                 obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`;
             } else {
+                // Escolhe uma rola aleatoriamente
+                const rolaImageIndex = Math.floor(Math.random() * ROLA_IMAGES.length);
+                const selectedRolaImage = ROLA_IMAGES[rolaImageIndex];
+                
                 obj.classList.add('rola'); // Adiciona a classe 'rola' para aplicar os estilos CSS
-                // Define a imagem de fundo da rola aleatoriamente a partir das URLs fornecidas
-                obj.style.backgroundImage = `url(${ROLA_IMAGES[Math.floor(Math.random() * ROLA_IMAGES.length)]})`;
+                obj.style.backgroundImage = `url(${selectedRolaImage})`;
+
+                // Se for a "Rola 2", adiciona a classe para torná-la maior
+                if (selectedRolaImage === 'https://files.catbox.moe/b9dyhd.png') {
+                    obj.classList.add('large-rola');
+                }
             }
 
             // Largura do objeto (usa o valor do CSS ou padrão)
-            const objWidth = obj.offsetWidth || 100; // Usar o novo tamanho padrão
+            // Se for uma large-rola, usa o tamanho da large-rola, senão usa o tamanho padrão
+            const objWidth = obj.classList.contains('large-rola') ? (obj.offsetWidth || 130) : (obj.offsetWidth || 100);
+            
             // Define uma posição X inicial aleatória para o objeto
             obj.x = Math.random() * (gameContainer.offsetWidth - objWidth);
             obj.y = -objWidth; // Inicia o objeto acima do contêiner do jogo
@@ -705,10 +973,13 @@
                 obj.style.top = `${obj.y}px`; // Atualiza a posição do objeto no DOM
 
                 // Obtém as dimensões e posições do objeto
+                const objWidth = obj.classList.contains('large-rola') ? (obj.offsetWidth || 130) : (obj.offsetWidth || 100);
+                const objHeight = obj.classList.contains('large-rola') ? (obj.offsetHeight || 130) : (obj.offsetHeight || 100);
+
                 const objLeft = obj.x;
-                const objRight = obj.x + (obj.offsetWidth || 100);
+                const objRight = obj.x + objWidth;
                 const objTop = obj.y;
-                const objBottom = obj.y + (obj.offsetHeight || 100);
+                const objBottom = obj.y + objHeight;
 
                 // Lógica para abrir a boca antes da colisão e controlar o z-index
                 if (objBottom > (characterTop - mouthOpenTriggerDistance) &&
@@ -718,7 +989,7 @@
 
                     // Se a boca ainda não foi acionada para este objeto, aciona a animação
                     if (!obj.mouthOpenTriggered) {
-                        character.style.backgroundImage = `url(${CHARACTER_MOUTH_OPEN_IMAGE})`; // Abre a boca
+                        character.style.backgroundImage = `url(${currentCharacterMouthOpenImage})`; // Abre a boca
                         character.classList.add('character-eating'); // Adiciona classe para o efeito de "salto"
                         obj.mouthOpenTriggered = true; // Marca que a boca foi acionada para este objeto
                     }
@@ -757,7 +1028,7 @@
 
                     // Reseta a animação da boca após um curto atraso
                     setTimeout(() => {
-                        character.style.backgroundImage = `url(${CHARACTER_MOUTH_CLOSED_IMAGE})`; // Fecha a boca
+                        character.style.backgroundImage = `url(${currentCharacterMouthClosedImage})`; // Fecha a boca
                         character.classList.remove('character-eating'); // Remove classe do efeito de "salto"
                     }, 300); // Duração da animação de boca aberta e salto
                 }
@@ -785,6 +1056,8 @@
 
             finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`; // Exibe a pontuação final
             gameOverScreen.style.display = 'flex'; // Mostra a tela de fim de jogo
+            backgroundMusic.pause(); // Pausa a música ao terminar o jogo
+            audioToggleButton.textContent = 'Música: OFF'; // Reseta o texto do botão
         }
 
         // --- Eventos de Carregamento e Redimensionamento ---
@@ -801,7 +1074,8 @@
 
                 // Ajusta a posição dos objetos se eles ficarem fora dos limites horizontais após o redimensionamento
                 rolas.forEach(obj => {
-                    const objWidth = obj.offsetWidth || 100; // Usar o novo tamanho padrão
+                    // Usa o tamanho correto do objeto para o cálculo
+                    const objWidth = obj.classList.contains('large-rola') ? (obj.offsetWidth || 130) : (obj.offsetWidth || 100);
                     if (obj.x + objWidth > gameContainer.offsetWidth) {
                         obj.x = gameContainer.offsetWidth - objWidth;
                         obj.style.left = `${obj.x}px`;
