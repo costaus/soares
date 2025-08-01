@@ -7,12 +7,183 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- Tone.js para geração de áudio (mantido para os sons de penalidade) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+
+    <!-- Firebase CDN Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase instances
+        let app;
+        let db;
+        let auth;
+        let currentUserId = null; // To store the authenticated user's UID or anonymous ID
+        let currentNickname = "Jogador Anônimo"; // Default nickname
+
+        // Function to initialize Firebase and authenticate
+        async function initializeFirebaseAndAuth() {
+            if (app) return; // Already initialized
+
+            // Use __app_id and __firebase_config provided by the Canvas environment
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Fallback if not provided
+
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Authenticate user
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    console.log("Firebase: User is signed in with UID:", currentUserId);
+                    // Load nickname if exists
+                    const loadedNick = await loadNickname();
+                    if (loadedNick) {
+                        currentNickname = loadedNick;
+                        document.getElementById('nickname-input').value = currentNickname;
+                    } else {
+                        document.getElementById('nickname-input').value = "Jogador Anônimo"; // Default if no saved nick
+                    }
+                    displayTopScores(); // Display scores after auth and nickname load
+                } else {
+                    console.log("Firebase: No user is signed in. Signing in anonymously...");
+                    try {
+                        // Use __initial_auth_token if provided by the Canvas environment
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Firebase Auth Error:", error);
+                        // Fallback to a random ID if anonymous sign-in fails
+                        currentUserId = crypto.randomUUID();
+                        document.getElementById('nickname-input').value = "Jogador Anônimo";
+                        displayTopScores(); // Try to display scores even if auth failed
+                    }
+                }
+            });
+        }
+
+        // Firestore functions for nickname and scores
+        async function saveNickname(nickname) {
+            if (!db || !currentUserId) {
+                console.error("Firestore not initialized or user not authenticated.");
+                return;
+            }
+            try {
+                // Store nickname in a subcollection under the user's UID
+                const userDocRef = doc(db, `artifacts/${__app_id}/users/${currentUserId}/profile`, 'nickname');
+                await setDoc(userDocRef, { nickname: nickname }, { merge: true });
+                currentNickname = nickname; // Update global nickname
+                console.log("Nickname saved:", nickname);
+            } catch (e) {
+                console.error("Error saving nickname:", e);
+            }
+        }
+
+        async function loadNickname() {
+            if (!db || !currentUserId) {
+                console.error("Firestore not initialized or user not authenticated.");
+                return null;
+            }
+            try {
+                const userDocRef = doc(db, `artifacts/${__app_id}/users/${currentUserId}/profile`, 'nickname');
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    return docSnap.data().nickname;
+                } else {
+                    console.log("No nickname found for this user.");
+                    return null;
+                }
+            } catch (e) {
+                console.error("Error loading nickname:", e);
+                return null;
+            }
+        }
+
+        async function saveScore(nickname, score) {
+            if (!db || !currentUserId) {
+                console.error("Firestore not initialized or user not authenticated.");
+                return;
+            }
+            try {
+                // Save scores to a public collection
+                await addDoc(collection(db, `artifacts/${__app_id}/public/data/scores`), {
+                    nickname: nickname,
+                    score: score,
+                    timestamp: Date.now() // For ordering by recency if scores are tied
+                });
+                console.log("Score saved:", score);
+            } catch (e) {
+                console.error("Error saving score:", e);
+            }
+        }
+
+        async function getTopScores() {
+            if (!db) {
+                console.error("Firestore not initialized.");
+                return [];
+            }
+            try {
+                const scoresRef = collection(db, `artifacts/${__app_id}/public/data/scores`);
+                const q = query(scoresRef, orderBy("score", "desc"), orderBy("timestamp", "desc"), limit(5)); // Top 5 scores, then by recency
+                const querySnapshot = await getDocs(q);
+                const topScores = [];
+                querySnapshot.forEach((doc) => {
+                    topScores.push(doc.data());
+                });
+                return topScores;
+            } catch (e) {
+                console.error("Error getting top scores:", e);
+                return [];
+            }
+        }
+
+        async function displayTopScores() {
+            const topScores = await getTopScores();
+            const rankingList = document.getElementById('ranking-list');
+            rankingList.innerHTML = ''; // Clear previous list
+
+            if (topScores.length === 0) {
+                rankingList.innerHTML = '<li class="text-center text-gray-400">Nenhum recorde ainda. Seja o primeiro!</li>';
+                return;
+            }
+
+            topScores.forEach((scoreEntry, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'flex justify-between items-center py-2 px-4 rounded-lg mb-2';
+                // Add different styles for top 3
+                if (index === 0) listItem.classList.add('bg-yellow-700', 'text-yellow-100', 'font-extrabold', 'shadow-lg');
+                else if (index === 1) listItem.classList.add('bg-gray-600', 'text-gray-200', 'font-bold');
+                else if (index === 2) listItem.classList.add('bg-amber-700', 'text-amber-100', 'font-semibold');
+                else listItem.classList.add('bg-gray-800', 'text-white');
+
+                listItem.innerHTML = `
+                    <span class="text-lg">${index + 1}. ${scoreEntry.nickname}</span>
+                    <span class="text-xl">${scoreEntry.score}</span>
+                `;
+                rankingList.appendChild(listItem);
+            });
+        }
+
+        // Expose global variables and functions to the main script
+        window.initializeFirebaseAndAuth = initializeFirebaseAndAuth;
+        window.saveNickname = saveNickname;
+        window.loadNickname = loadNickname;
+        window.saveScore = saveScore;
+        window.getTopScores = getTopScores;
+        window.displayTopScores = displayTopScores;
+        window.getCurrentNickname = () => currentNickname;
+        window.setCurrentNickname = (nick) => { currentNickname = nick; }; // Allow setting nickname from main script
+    </script>
+
     <style>
         /* Estilos gerais do corpo da página */
         body {
             margin: 0;
-            /* Usar 100dvh para garantir que a altura da viewport dinâmica seja usada,
-               considerando as barras de navegação do navegador */
             min-height: 100dvh; 
             display: flex;
             justify-content: center;
@@ -22,7 +193,7 @@
             color: white;
             flex-direction: column;
             position: relative;
-            overflow: hidden; /* Garante que não haja rolagem no body */
+            overflow: hidden;
         }
 
         /* Estilos do contêiner principal do jogo */
@@ -30,22 +201,18 @@
             position: relative;
             width: 95%;
             max-width: 900px;
-            /* Ajuste da altura para subtrair espaço das barras de navegação e garantir que caiba na tela.
-               O 100dvh é a altura total da viewport, e subtraímos um valor para margem/padding. */
-            height: calc(100dvh - 40px); /* Ajustado para caber na tela sem rolagem */
+            height: calc(100dvh - 40px);
             background-color: #333;
             border-radius: 30px;
             overflow: hidden;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             border: 12px solid #ff69b4;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
-            background-image: url('https://iili.io/FUu2yhv.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         /* Estilos da tela de início do jogo */
@@ -102,27 +269,35 @@
         /* Estilos do display de pontuação */
         #score-display {
             position: absolute;
-            top: 15px; /* AJUSTADO: Mais para cima para não ser cortado */
-            left: 20px; /* AJUSTADO: Mais para dentro */
+            top: 15px; /* AJUSTADO */
+            left: 20px; /* AJUSTADO */
             font-size: 3.5em;
             font-weight: bold;
             color: #FFD700;
             text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
             z-index: 10;
-            white-space: nowrap; /* Impede que o texto quebre */
+            white-space: nowrap;
         }
 
-        /* Estilos do display de vidas (REMOVIDO DO HTML, mas mantendo o estilo caso seja reintroduzido ou para referência) */
+        /* Estilos do display de vidas */
         #lives-display {
-            display: none; /* Garante que não seja visível */
+            position: absolute;
+            top: 15px; /* AJUSTADO */
+            right: 20px; /* AJUSTADO */
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            white-space: nowrap;
         }
 
         /* Estilos do personagem principal */
         #character {
             position: absolute;
-            bottom: 100px; /* Posição do personagem */
-            width: 180px; /* AJUSTADO: Ligeiramente maior */
-            height: 180px; /* AJUSTADO: Ligeiramente maior */
+            bottom: 100px;
+            width: 180px;
+            height: 180px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -438,32 +613,163 @@
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
-        /* Ajustes responsivos para telas menores (tablets) */
+        /* Estilos da tela de perfil/ranking */
+        #profile-ranking-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
+            display: none; /* Escondido por padrão */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 101;
+            border-radius: 25px;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #profile-ranking-screen h2 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            color: #FFD700;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        #nickname-input-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #nickname-input {
+            padding: 10px 15px;
+            font-size: 1.5em;
+            border-radius: 10px;
+            border: 2px solid #ff69b4;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            max-width: 250px;
+        }
+
+        #nickname-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #save-nickname-button {
+            padding: 12px 25px;
+            font-size: 1.2em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        #save-nickname-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        #ranking-section {
+            width: 90%;
+            max-width: 400px;
+            background-color: rgba(50, 50, 50, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            margin-top: 30px;
+        }
+
+        #ranking-section h3 {
+            font-size: 2em;
+            color: #FFD700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        #ranking-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #ranking-list li {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #ranking-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        #ranking-list li span:first-child {
+            font-weight: bold;
+        }
+
+        #play-game-from-profile-button {
+            margin-top: 40px;
+            padding: 15px 30px;
+            font-size: 1.8em;
+            background: linear-gradient(145deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        #play-game-from-profile-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
+
+        /* Ajustes responsivos */
         @media (max-width: 768px) {
             #game-container {
-                width: 95%;
-                height: calc(100dvh - 30px); /* Ajuste para tablets */
+                padding: 5px;
+                height: calc(100dvh - 30px);
             }
-            #start-screen h1 {
-                font-size: 3.5em;
+            #start-screen h1, #game-over-screen h2 {
+                font-size: 3em;
             }
-            #start-button {
-                padding: 18px 35px;
-                font-size: 1.8em;
+            #start-button, #restart-button {
+                padding: 15px 30px;
+                font-size: 1.5em;
             }
             #score-display {
-                font-size: 2.2em;
-                top: 20px; /* AJUSTADO: Mais para baixo para tablets */
-                left: 15px; /* AJUSTADO */
-                right: auto; /* Garante que não haja conflito com 'right' */
+                font-size: 1.8em; /* Ajustado para tablets */
+                top: 10px;
+                left: 15px;
             }
-            #lives-display { /* Mantendo o estilo para referência, mas display: none */
-                display: none;
+            #lives-display {
+                font-size: 1.8em; /* Ajustado para tablets */
+                top: 10px;
+                right: 15px;
             }
             #character {
-                width: 140px; /* AJUSTADO: Ligeiramente maior para tablets */
-                height: 140px; /* AJUSTADO: Ligeiramente maior para tablets */
-                bottom: 20px; /* AJUSTADO: Posição do personagem para tablets */
+                width: 140px;
+                height: 140px;
+                bottom: 20px;
             }
             .rola {
                 width: 80px;
@@ -473,83 +779,65 @@
                 width: 80px;
                 height: 80px;
             }
-            #game-over-screen h2 {
-                font-size: 3em;
-            }
             #game-over-screen p {
-                font-size: 1.8em;
-            }
-            #restart-button {
-                padding: 12px 25px;
-                font-size: 1.8em;
-            }
-            /* Menu Principal Responsivo para Tablets */
-            #main-menu h1 {
-                font-size: 3.5em;
-                margin-bottom: 60px;
-            }
-            .menu-button {
-                padding: 20px 45px;
-                font-size: 2.2em;
-                min-width: 300px;
-                margin: 20px;
-            }
-            #audio-toggle-button {
-                font-size: 1em;
-                padding: 8px 15px;
-            }
-            /* Seleção de Personagem Responsiva para Tablets */
-            #character-select-screen h2 {
-                font-size: 3.5em;
-                margin-bottom: 40px;
-                padding-top: 15px;
-            }
-            .character-selection-container {
-                gap: 20px;
-                height: 50%;
-            }
-            .character-card {
-                max-width: 48%;
-            }
-            .character-card img {
-                width: 180px; /* AJUSTADO: Tamanho fixo para tablets */
-                height: 180px; /* AJUSTADO: Tamanho fixo para tablets */
-            }
-            .character-card h3 {
                 font-size: 1.5em;
             }
-            #start-game-after-character-select {
-                padding: 12px 25px;
+            /* Profile/Ranking Screen Adjustments */
+            #profile-ranking-screen h2 {
+                font-size: 2.8em;
+                margin-bottom: 20px;
+            }
+            #nickname-input {
                 font-size: 1.2em;
-                margin-top: 30px;
+                max-width: 200px;
+            }
+            #save-nickname-button {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+            #ranking-section {
+                width: 95%;
+                padding: 15px;
+            }
+            #ranking-section h3 {
+                font-size: 1.5em;
+            }
+            #ranking-list li {
+                font-size: 0.9em;
+                padding: 8px 12px;
+            }
+            #play-game-from-profile-button {
+                font-size: 1.4em;
+                padding: 12px 25px;
             }
         }
 
-        /* Ajustes responsivos para telas muito pequenas (smartphones) */
         @media (max-width: 480px) {
             #game-container {
-                height: calc(100dvh - 20px); /* Ajuste mais agressivo para smartphones */
+                width: 98%;
+                height: calc(100dvh - 20px);
             }
-            #start-screen h1 {
+            #start-screen h1, #game-over-screen h2 {
                 font-size: 2.5em;
             }
-            #start-button {
+            #start-button, #restart-button {
                 padding: 10px 20px;
                 font-size: 1.2em;
             }
             #score-display {
                 font-size: 1.2em;
-                top: 10px; /* AJUSTADO: Mais para cima para smartphones */
+                top: 5px;
                 left: 10px;
-                right: auto; /* Garante que não haja conflito com 'right' */
             }
-            #lives-display { /* Mantendo o estilo para referência, mas display: none */
-                display: none;
+            #lives-display {
+                font-size: 1.2em;
+                top: 5px;
+                right: 10px;
             }
             #character {
-                width: 100px; /* AJUSTADO: Ligeiramente maior para smartphones */
-                height: 100px; /* AJUSTADO: Ligeiramente maior para smartphones */
-                bottom: 15px; /* Posição do personagem para smartphones */
+                width: 100px;
+                height: 100px;
+                bottom: 15px;
             }
             .rola {
                 width: 50px;
@@ -559,59 +847,38 @@
                 width: 50px;
                 height: 50px;
             }
-            #game-over-screen h2 {
-                font-size: 2em;
-            }
             #game-over-screen p {
-                font-size: 1em;
-            }
-            #restart-button {
-                padding: 8px 15px;
-                font-size: 1em;
-            }
-            /* Menu Principal Responsivo para Smartphones */
-            #main-menu h1 {
-                font-size: 2.2em;
-                margin-bottom: 30px;
-            }
-            .menu-button {
-                padding: 12px 25px;
-                font-size: 1.5em;
-                min-width: 200px;
-                margin: 10px;
-            }
-            #audio-toggle-button {
-                font-size: 0.8em;
-                padding: 5px 10px;
-                bottom: 10px;
-            }
-            /* Seleção de Personagem Responsiva para Smartphones */
-            #character-select-screen h2 {
-                font-size: 2.2em;
-                margin-bottom: 20px;
-                padding-top: 10px;
-            }
-            .character-selection-container {
-                flex-direction: column;
-                gap: 20px;
-                height: auto;
-            }
-            .character-card {
-                width: 100%;
-                max-width: 250px;
-                margin-bottom: 40px;
-            }
-            .character-card img {
-                width: 150px; /* AJUSTADO: Tamanho fixo para smartphones */
-                height: 150px; /* AJUSTADO: Tamanho fixo para smartphones */
-            }
-            .character-card h3 {
                 font-size: 1.2em;
             }
-            #start-game-after-character-select {
-                padding: 10px 20px;
+            /* Profile/Ranking Screen Adjustments */
+            #profile-ranking-screen h2 {
+                font-size: 2.2em;
+                margin-bottom: 15px;
+            }
+            #nickname-input {
                 font-size: 1em;
+                max-width: 180px;
+            }
+            #save-nickname-button {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+            #ranking-section {
+                width: 98%;
+                padding: 10px;
                 margin-top: 20px;
+            }
+            #ranking-section h3 {
+                font-size: 1.2em;
+            }
+            #ranking-list li {
+                font-size: 0.8em;
+                padding: 6px 10px;
+            }
+            #play-game-from-profile-button {
+                font-size: 1.1em;
+                padding: 10px 20px;
+                margin-top: 30px;
             }
         }
     </style>
@@ -623,6 +890,23 @@
             <h1>Escolha seu Jogo</h1>
             <button id="cai-rola-button" class="menu-button">CAI ROLA</button>
             <button id="pica-man-button" class="menu-button">PICA-MAN (Em Breve)</button>
+        </div>
+
+        <!-- Tela de Perfil/Ranking -->
+        <div id="profile-ranking-screen">
+            <h2>Seu Perfil e Ranking</h2>
+            <div id="nickname-input-container">
+                <input type="text" id="nickname-input" placeholder="Seu Nickname" maxlength="15">
+                <button id="save-nickname-button">Salvar Nickname</button>
+            </div>
+            <div id="ranking-section">
+                <h3>Top 5 Pontuações</h3>
+                <ul id="ranking-list">
+                    <!-- Ranking items will be inserted here by JavaScript -->
+                    <li>Carregando ranking...</li>
+                </ul>
+            </div>
+            <button id="play-game-from-profile-button" class="menu-button">Jogar Comedor de Rolas</button>
         </div>
 
         <!-- Tela de Seleção de Personagem -->
@@ -649,8 +933,8 @@
             </div>
             <!-- Display de pontuação -->
             <div id="score-display">Rolas: 0</div>
-            <!-- Display de vidas (REMOVIDO) -->
-            <!-- <div id="lives-display">Vidas: 3</div> --> 
+            <!-- Display de vidas -->
+            <div id="lives-display">Vidas: 3</div> 
             <!-- Personagem principal -->
             <div id="character"></div>
             <!-- Tela de Fim de Jogo -->
@@ -658,23 +942,35 @@
                 <h2>Fim de Jogo!</h2>
                 <p id="final-score">Sua Pontuação Final: 0</p>
                 <button id="restart-button">Jogar Novamente</button>
+                <button id="view-ranking-button" class="menu-button">Ver Ranking</button> <!-- Novo botão -->
             </div>
              <!-- Botão de controle de áudio de fundo -->
             <button id="audio-toggle-button">Gemidos: OFF</button>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Importa as funções globais do script Firebase (definidas no head)
+        const initializeFirebaseAndAuth = window.initializeFirebaseAndAuth;
+        const saveNickname = window.saveNickname;
+        const loadNickname = window.loadNickname;
+        const saveScore = window.saveScore;
+        const getTopScores = window.getTopScores;
+        const displayTopScores = window.displayTopScores;
+        const getCurrentNickname = window.getCurrentNickname;
+        const setCurrentNickname = window.setCurrentNickname;
+
         // --- Referências aos Elementos HTML ---
         const gameContainer = document.getElementById('game-container');
         const character = document.getElementById('character');
         const scoreDisplay = document.getElementById('score-display');
-        // REMOVIDO: const livesDisplay = document.getElementById('lives-display');
-        const startScreen = document.getElementById('start-screen'); // Tela de início do Cai Rola
+        const livesDisplay = document.getElementById('lives-display'); 
+        const startScreen = document.getElementById('start-screen');
         const startButton = document.getElementById('start-button');
         const gameOverScreen = document.getElementById('game-over-screen');
         const finalScoreDisplay = document.getElementById('final-score');
         const restartButton = document.getElementById('restart-button');
+        const viewRankingButton = document.getElementById('view-ranking-button'); // Novo botão
 
         // Elementos do Menu Principal
         const mainMenu = document.getElementById('main-menu');
@@ -682,13 +978,19 @@
         const picaManButton = document.getElementById('pica-man-button');
         const caiRolaGameWrapper = document.getElementById('cai-rola-game-wrapper');
 
+        // Elementos da Tela de Perfil/Ranking
+        const profileRankingScreen = document.getElementById('profile-ranking-screen');
+        const nicknameInput = document.getElementById('nickname-input');
+        const saveNicknameButton = document.getElementById('save-nickname-button');
+        const playGameFromProfileButton = document.getElementById('play-game-from-profile-button');
+
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
-        const characterCards = document.querySelectorAll('.character-card'); // Seleciona os cards
+        const characterCards = document.querySelectorAll('.character-card');
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
-        let collectSound = new Audio('https://files.catbox.moe/qegrfu.mp3'); // Áudio para o som de coleta
+        let collectSound = new Audio('https://files.catbox.moe/qegrfu.mp3');
 
         // Variável de controle global para o áudio
         let isSoundEnabled = true; 
@@ -698,39 +1000,40 @@
             'https://files.catbox.moe/n39c1e.png', // Rola 1
             'https://files.catbox.moe/qkukmd.png'  // Rola 3
         ];
-        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // Imagem de penalidade
+        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // CORRIGIDO: Imagem de penalidade
 
         // Dados dos Personagens - CORRIGIDO E VERIFICADO
         const characterData = {
             'carlinha': {
                 name: 'Carlinha Catatau',
-                selectionImage: 'https://files.catbox.moe/xyhrnx.png', // Imagem para o card de seleção
-                closedMouthImage: 'https://files.catbox.moe/hjspq9.png', // Carlinha Boca fechada
-                openMouthImage: 'https://files.catbox.moe/5dz13l.png' // Carlinha Boca aberta
+                selectionImage: 'https://files.catbox.moe/xyhrnx.png',
+                closedMouthImage: 'https://files.catbox.moe/hjspq9.png',
+                openMouthImage: 'https://files.catbox.moe/5dz13l.png'
             },
             'eduardo': {
                 name: 'Eduardo Vício Pinto',
-                selectionImage: 'https://files.catbox.moe/fvn4j3.png', // Imagem para o card de seleção
-                closedMouthImage: 'https://files.catbox.moe/1aae2b.png', // Dudu boca fechada (NOVA IMAGEM)
-                openMouthImage: 'https://files.catbox.moe/olc9ni.png' // Dudu boca aberta
+                selectionImage: 'https://files.catbox.moe/fvn4j3.png',
+                closedMouthImage: 'https://files.catbox.moe/1aae2b.png',
+                openMouthImage: 'https://files.catbox.moe/olc9ni.png'
             }
         };
 
         // Variáveis para as imagens do personagem atualmente selecionado
-        let currentCharacterMouthOpenImage = characterData.carlinha.openMouthImage; // Default para evitar erro inicial
-        let currentCharacterMouthClosedImage = characterData.carlinha.closedMouthImage; // Default
+        let currentCharacterMouthOpenImage = characterData.carlinha.openMouthImage;
+        let currentCharacterMouthClosedImage = characterData.carlinha.closedMouthImage;
 
         // Variável para armazenar o ID do personagem selecionado
         let selectedCharacterId = null;
 
         // --- Variáveis de Jogo ---
         let score = 0;
-        // REMOVIDO: let lives = 3;
+        let lives = 3; 
         let characterX = 0;
-        let rolas = []; // Array para armazenar os objetos caindo (incluindo penalidades)
+        let rolas = [];
         let rolaGenerationInterval;
         let gameRunning = false;
         let gameOver = false;
+        let gameLoopRAF; // Variável para o requestAnimationFrame do gameLoop
 
         // Variáveis para o controle de arrastar
         let isDragging = false;
@@ -741,42 +1044,30 @@
         let penaltySynth;
 
         function setupAudioEffects() {
-            // Sintetizador para o som de penalidade (som mais abrupto/negativo)
             penaltySynth = new Tone.Synth({
-                oscillator: {
-                    type: "sawtooth" // Onda dente de serra para um som mais áspero
-                },
-                envelope: {
-                    attack: 0.01, // Ataque rápido
-                    decay: 0.2,
-                    sustain: 0.1,
-                    release: 0.3
-                },
-                volume: -8 // Volume um pouco mais alto
+                oscillator: { type: "sawtooth" },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.3 },
+                volume: -8
             }).toDestination();
         }
 
-        // Função para tocar o som de coleta (usando o áudio fornecido)
         function playCollectSound() {
-            if (isSoundEnabled && collectSound.paused) { // Toca somente se o som estiver habilitado
-                collectSound.currentTime = 0; // Reinicia o áudio para tocar do início
+            if (isSoundEnabled) {
+                collectSound.currentTime = 0;
                 collectSound.play().catch(e => console.log("Erro ao tocar som de coleta:", e));
             }
         }
 
-        // Função para tocar o som de penalidade (usando Tone.js)
         function playPenaltySound() {
-            if (isSoundEnabled) { // Toca somente se o som estiver habilitado
+            if (isSoundEnabled) {
                 if (Tone.context.state !== 'running') {
-                    Tone.start(); // Inicia o contexto de áudio na primeira interação do usuário
+                    Tone.start();
                 }
-                penaltySynth.triggerAttackRelease("C3", "0.5"); // Toca uma nota C3 por 0.5 segundos
+                penaltySynth.triggerAttackRelease("C3", "0.5");
             }
         }
 
         // --- Funções de Inicialização ---
-
-        // Função para inicializar a posição do personagem e suas imagens
         function initializeCharacterPosition() {
             if (character.offsetWidth === 0) {
                 setTimeout(initializeCharacterPosition, 50);
@@ -784,82 +1075,97 @@
             }
             characterX = (gameContainer.offsetWidth / 2) - (character.offsetWidth / 2);
             character.style.left = `${characterX}px`;
-            // Define a imagem inicial do personagem com base na seleção
             character.style.backgroundImage = `url(${currentCharacterMouthClosedImage})`;
         }
 
         // --- Gerenciamento de Telas ---
-        function showMainMenu() {
-            mainMenu.style.display = 'flex';
+        function hideAllScreens() {
+            mainMenu.style.display = 'none';
             caiRolaGameWrapper.style.display = 'none';
-            characterSelectScreen.style.display = 'none'; // Esconde tela de seleção
+            characterSelectScreen.style.display = 'none';
+            profileRankingScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             startScreen.style.display = 'none';
-            audioToggleButton.style.display = 'none'; // Esconde o botão de áudio no menu
-            audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
-            isSoundEnabled = false; // Desativa o som ao voltar para o menu principal
+            audioToggleButton.style.display = 'none';
+        }
+
+        function showMainMenu() {
+            hideAllScreens();
+            mainMenu.style.display = 'flex';
+            audioToggleButton.textContent = 'Gemidos: OFF';
+            isSoundEnabled = false;
+            if (gameLoopRAF) cancelAnimationFrame(gameLoopRAF);
+            if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
+        }
+
+        async function showProfileRankingScreen() {
+            hideAllScreens();
+            profileRankingScreen.style.display = 'flex';
+            // Load nickname and display it
+            const loadedNick = await loadNickname();
+            if (loadedNick) {
+                nicknameInput.value = loadedNick;
+                setCurrentNickname(loadedNick); // Update global nickname
+            } else {
+                nicknameInput.value = "Jogador Anônimo";
+                setCurrentNickname("Jogador Anônimo");
+            }
+            displayTopScores(); // Display current ranking
         }
 
         function showCharacterSelectScreen() {
-            mainMenu.style.display = 'none';
-            caiRolaGameWrapper.style.display = 'block'; // O wrapper do jogo precisa estar visível para a tela de seleção
-            characterSelectScreen.style.display = 'flex'; // Mostra a tela de seleção
-            startScreen.style.display = 'none';
-            gameOverScreen.style.display = 'none';
-            audioToggleButton.style.display = 'none'; // Esconde o botão de áudio na seleção de personagem
-
-            // Atualiza as imagens dos personagens na tela de seleção
-            document.querySelector('.character-card[data-character-id="carlinha"] img').src = characterData.carlinha.selectionImage;
-            document.querySelector('.character-card[data-character-id="eduardo"] img').src = characterData.eduardo.selectionImage;
-            
-            // Remove a classe 'selected' de todos os cards
+            hideAllScreens();
+            caiRolaGameWrapper.style.display = 'block'; // Wrapper precisa estar visível
+            characterSelectScreen.style.display = 'flex';
             characterCards.forEach(card => card.classList.remove('selected'));
-            selectedCharacterId = null; // Reseta a seleção
+            selectedCharacterId = null;
         }
 
         function showCaiRolaGameScreen() {
-            characterSelectScreen.style.display = 'none'; // Esconde a tela de seleção
-            startScreen.style.display = 'flex'; // Mostra a tela de início do jogo
-            audioToggleButton.style.display = 'block'; // Mostra o botão de áudio no jogo
+            hideAllScreens();
+            caiRolaGameWrapper.style.display = 'block'; // Wrapper precisa estar visível
+            startScreen.style.display = 'flex';
+            audioToggleButton.style.display = 'block';
         }
 
         // --- Início e Loop do Jogo "CAI ROLA" ---
-
         function startCaiRolaGame() {
             if (!selectedCharacterId) {
-                // Isso não deve acontecer se o fluxo for seguido, mas é uma segurança
                 alert('Por favor, selecione um personagem primeiro!');
                 return;
             }
 
-            score = 0; // Reseta a pontuação
-            // REMOVIDO: lives = 3;
-            scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
-            // REMOVIDO: livesDisplay.textContent = `Vidas: ${lives}`;
-            rolas = []; // Limpa quaisquer objetos existentes
-            // Remove todos os elementos .rola e .penalty-object do DOM, caso existam de uma partida anterior
-            document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
-
-            // CORREÇÃO CRÍTICA: Esconde a tela de início imediatamente antes de iniciar o loop
-            startScreen.style.display = 'none'; 
+            // --- RESET DE ESTADO DO JOGO ---
+            score = 0;
+            lives = 3; // REINTRODUZIDO
+            scoreDisplay.textContent = `Rolas: ${score}`;
+            livesDisplay.textContent = `Vidas: ${lives}`; // REINTRODUZIDO
             
-            gameRunning = true; // Define o estado do jogo como rodando
-            gameOver = false; // Reseta o estado de fim de jogo
-            initializeCharacterPosition(); // Garante que o personagem esteja no centro com a imagem correta
-            gameLoop(); // Inicia o loop principal do jogo
-            // Inicia a geração de novos objetos a cada 1200ms (mais lento)
-            rolaGenerationInterval = setInterval(createFallingObject, 1200);
+            if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
+            document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
+            rolas = []; 
 
-            // Tenta ativar o áudio ao iniciar o jogo
-            isSoundEnabled = true; // Ativa o som ao iniciar o jogo
-            audioToggleButton.textContent = 'Gemidos: ON'; // Atualiza o texto do botão
+            if (gameLoopRAF) cancelAnimationFrame(gameLoopRAF);
+
+            hideAllScreens(); // Esconde todas as telas antes de mostrar o jogo
+            caiRolaGameWrapper.style.display = 'block'; // Mostra o wrapper do jogo
+            audioToggleButton.style.display = 'block'; // Mostra o botão de áudio
+            
+            gameRunning = true;
+            gameOver = false;
+            initializeCharacterPosition();
+
+            rolaGenerationInterval = setInterval(createFallingObject, 900);
+            gameLoopRAF = requestAnimationFrame(gameLoop);
+
+            isSoundEnabled = true;
+            audioToggleButton.textContent = 'Gemidos: ON';
         }
 
         // --- Event Listeners para Botões ---
         caiRolaButton.addEventListener('click', () => {
-            showCharacterSelectScreen(); // Vai para a tela de seleção de personagem
-            // Inicializa os efeitos de áudio aqui, na primeira interação do usuário
-            if (!penaltySynth) { // Garante que o setup seja feito apenas uma vez
+            showProfileRankingScreen(); // Vai para a tela de perfil/ranking
+            if (!penaltySynth) {
                 setupAudioEffects();
             }
         });
@@ -869,20 +1175,18 @@
         });
 
         startButton.addEventListener('click', startCaiRolaGame);
-        restartButton.addEventListener('click', startCaiRolaGame);
+        restartButton.addEventListener('click', startCaiRolaGame); // Botão de reiniciar agora funciona
+        viewRankingButton.addEventListener('click', showProfileRankingScreen); // Novo botão
 
-        // Event Listeners para os CARDS de seleção de personagem (AGORA INICIAM O JOGO DIRETAMENTE)
+        // Event Listeners para os CARDS de seleção de personagem
         characterCards.forEach(card => {
             card.addEventListener('click', (event) => {
-                // Remove a classe 'selected' de todos os cards
                 characterCards.forEach(c => c.classList.remove('selected'));
-                // Adiciona a classe 'selected' ao card clicado
                 card.classList.add('selected');
 
                 selectedCharacterId = card.dataset.characterId;
                 const selectedChar = characterData[selectedCharacterId];
                 
-                // Define as imagens do personagem selecionado para uso no jogo
                 currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
                 currentCharacterMouthOpenImage = selectedChar.openMouthImage;
 
@@ -892,14 +1196,26 @@
             });
         });
 
+        // Event Listeners para a tela de Perfil/Ranking
+        saveNicknameButton.addEventListener('click', () => {
+            const newNickname = nicknameInput.value.trim();
+            if (newNickname) {
+                saveNickname(newNickname);
+                displayTopScores(); // Refresh ranking after saving nickname
+            } else {
+                alert("Por favor, digite um nickname válido.");
+            }
+        });
+
+        playGameFromProfileButton.addEventListener('click', showCharacterSelectScreen); // Leva para seleção de personagem
+
         // --- Controle de Áudio de Fundo (agora controla todos os sons) ---
         audioToggleButton.addEventListener('click', () => {
-            isSoundEnabled = !isSoundEnabled; // Inverte o estado do som
+            isSoundEnabled = !isSoundEnabled;
             if (isSoundEnabled) {
                 audioToggleButton.textContent = 'Gemidos: ON';
             } else {
                 audioToggleButton.textContent = 'Gemidos: OFF';
-                // Pausa qualquer som de coleta que esteja tocando
                 collectSound.pause(); 
                 collectSound.currentTime = 0;
             }
@@ -911,7 +1227,7 @@
 
             const characterWidth = character.offsetWidth;
             const gameContainerWidth = gameContainer.offsetWidth;
-            const moveSpeed = 35; // Velocidade de movimento do personagem para teclado
+            const moveSpeed = 35;
 
             if (e.key === 'ArrowLeft' || e.key === 'a') {
                 characterX = Math.max(0, characterX - moveSpeed);
@@ -923,11 +1239,11 @@
 
         // --- Controles de Toque (para celular) ---
         character.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Previne o comportamento padrão do toque (ex: rolagem)
+            e.preventDefault();
             if (!gameRunning) return;
             isDragging = true;
             touchStartX = e.touches[0].clientX;
-            initialCharacterX = characterX; // Armazena a posição inicial do personagem ao iniciar o arrasto
+            initialCharacterX = characterX;
         }, { passive: false });
 
         character.addEventListener('touchmove', (e) => {
@@ -935,13 +1251,12 @@
             if (!isDragging || !gameRunning) return;
 
             const currentTouchX = e.touches[0].clientX;
-            const deltaX = currentTouchX - touchStartX; // Calcula a diferença do arrasto
-            let newCharacterX = initialCharacterX + deltaX; // Aplica a diferença à posição inicial do personagem
+            const deltaX = currentTouchX - touchStartX;
+            let newCharacterX = initialCharacterX + deltaX;
 
             const characterWidth = character.offsetWidth;
             const gameContainerWidth = gameContainer.offsetWidth;
 
-            // Limita o movimento do personagem dentro dos limites do contêiner do jogo
             characterX = Math.max(0, Math.min(gameContainerWidth - characterWidth, newCharacterX));
             character.style.left = `${characterX}px`;
         }, { passive: false });
@@ -951,68 +1266,54 @@
         });
 
         // --- Criação de Objetos Caindo (Rolas ou Penalidades) ---
-
         function createFallingObject() {
-            const obj = document.createElement('div'); // Cria um novo elemento div
-
-            // Decide aleatoriamente se será uma "rola" ou um "objeto de penalidade"
-            const isPenalty = Math.random() < 0.25; // 25% de chance de ser um objeto de penalidade
+            const obj = document.createElement('div');
+            const isPenalty = Math.random() < 0.25;
 
             if (isPenalty) {
-                obj.classList.add('penalty-object'); // Adiciona a classe para estilos de penalidade
-                obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`;
+                obj.classList.add('penalty-object');
+                obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`; // CORRIGIDO
             } else {
-                // Escolhe uma rola aleatoriamente (agora sem a "Rola 2" grande)
                 const rolaImageIndex = Math.floor(Math.random() * ROLA_IMAGES.length);
                 const selectedRolaImage = ROLA_IMAGES[rolaImageIndex];
-                
-                obj.classList.add('rola'); // Adiciona a classe 'rola' para aplicar os estilos CSS
+                obj.classList.add('rola');
                 obj.style.backgroundImage = `url(${selectedRolaImage})`;
             }
 
-            // Largura do objeto (usa o valor do CSS ou padrão)
-            // Agora, todos os objetos "rola" terão o mesmo tamanho padrão
             const objWidth = obj.offsetWidth || 100;
-            
-            // Define uma posição X inicial aleatória para o objeto
             obj.x = Math.random() * (gameContainer.offsetWidth - objWidth);
-            obj.y = -objWidth; // Inicia o objeto acima do contêiner do jogo
+            obj.y = -objWidth;
 
             obj.style.left = `${obj.x}px`;
             obj.style.top = `${obj.y}px`;
 
-            // Define uma velocidade de caída aleatória para cada objeto (mais lento)
-            obj.speed = 4 + Math.random() * 2; // Velocidade entre 4 e 6
+            obj.speed = 4 + Math.random() * 2;
 
-            obj.mouthOpenTriggered = false; // Flag para controlar se a boca já abriu para este objeto
+            obj.mouthOpenTriggered = false;
 
-            gameContainer.appendChild(obj); // Adiciona o objeto ao contêiner do jogo
-            rolas.push(obj); // Adiciona o objeto ao array de objetos ativos
+            gameContainer.appendChild(obj);
+            rolas.push(obj);
         }
 
         // --- Loop Principal do Jogo ---
-
         function gameLoop() {
-            if (!gameRunning || gameOver) return; // Se o jogo não estiver rodando ou for game over, para o loop
+            if (!gameRunning) return;
 
             const gameContainerHeight = gameContainer.offsetHeight;
             const characterHeight = character.offsetHeight;
             const characterWidth = character.offsetWidth;
-            const characterBottom = gameContainerHeight - 100; // Posição inferior do personagem (mesmo valor do CSS)
-            const characterTop = characterBottom - characterHeight; // Posição superior do personagem
+            const characterBottom = gameContainerHeight - 100;
+            const characterTop = characterBottom - characterHeight;
 
-            // Distância para a boca abrir antes da colisão (ajustado para o efeito de "camadas")
-            const mouthOpenTriggerDistance = 80; // Aumentado para que a boca abra mais cedo
-            const zIndexBehindCharacter = 3; // Z-index para objetos atrás do personagem
-            const zIndexInFrontOfCharacter = 6; // Z-index para objetos na frente do personagem
+            const mouthOpenTriggerDistance = 80;
+            const zIndexBehindCharacter = 3;
+            const zIndexInFrontOfCharacter = 6;
 
-            // Itera sobre os objetos de trás para frente para evitar problemas ao remover elementos
             for (let i = rolas.length - 1; i >= 0; i--) {
                 const obj = rolas[i];
-                obj.y += obj.speed; // Atualiza a posição Y do objeto (faz ele cair)
-                obj.style.top = `${obj.y}px`; // Atualiza a posição do objeto no DOM
+                obj.y += obj.speed;
+                obj.style.top = `${obj.y}px`;
 
-                // Obtém as dimensões e posições do objeto (agora todos os rolas têm o mesmo tamanho base)
                 const objWidth = obj.offsetWidth || 100;
                 const objHeight = obj.offsetHeight || 100;
 
@@ -1021,100 +1322,94 @@
                 const objTop = obj.y;
                 const objBottom = obj.y + objHeight;
 
-                // Lógica para abrir a boca antes da colisão e controlar o z-index
                 if (objBottom > (characterTop - mouthOpenTriggerDistance) &&
-                    objBottom < characterTop + (characterHeight / 2) && // Garante que esteja acima do meio do personagem
+                    objBottom < characterTop + (characterHeight / 2) &&
                     objRight > characterX &&
                     objLeft < (characterX + characterWidth)) {
 
-                    // Se a boca ainda não foi acionada para este objeto, aciona a animação
                     if (!obj.mouthOpenTriggered) {
-                        character.style.backgroundImage = `url(${currentCharacterMouthOpenImage})`; // Abre a boca
-                        character.classList.add('character-eating'); // Adiciona classe para o efeito de "salto"
-                        obj.mouthOpenTriggered = true; // Marca que a boca foi acionada para este objeto
+                        character.style.backgroundImage = `url(${currentCharacterMouthOpenImage})`;
+                        character.classList.add('character-eating');
+                        obj.mouthOpenTriggered = true;
                     }
-                    // Quando o objeto está na área de "comer", coloca-o atrás do personagem
                     obj.style.zIndex = zIndexBehindCharacter;
                 } else {
-                    // Se não estiver na área de "comer", garante que esteja na frente (z-index normal)
-                    obj.style.zIndex = zIndexInFrontOfCharacter; // Ou 4, o z-index padrão para rolas/penalidades
+                    obj.style.zIndex = zIndexInFrontOfCharacter;
                 }
 
-
-                // --- Detecção de Colisão Efetiva ---
                 if (objRight > characterX &&
                     objLeft < (characterX + characterWidth) &&
                     objBottom > characterTop &&
                     objTop < characterBottom) {
-                    // Colisão detectada!
                     
                     if (obj.classList.contains('rola')) {
-                        score += 3; // AJUSTADO: Incrementa a pontuação em 3 para rolas
-                        playCollectSound(); // Toca o som de coleta
+                        score += 3;
+                        playCollectSound();
                     } else if (obj.classList.contains('penalty-object')) {
-                        score -= 30; // Diminui a pontuação em 30
-                        // REMOVIDO: lives--;
-                        // REMOVIDO: livesDisplay.textContent = `Vidas: ${lives}`;
-                        playPenaltySound(); // Toca o som de penalidade
+                        score -= 30;
+                        lives--; // DECREMENTA VIDAS
+                        livesDisplay.textContent = `Vidas: ${lives}`; // ATUALIZA DISPLAY DE VIDAS
+                        playPenaltySound();
 
-                        // Fim de jogo imediato ao coletar penalidade
-                        endGame(); 
-                        return; // Sai do loop para evitar processamento adicional
+                        if (lives <= 0) { // VERIFICA SE AS VIDAS ACABARAM
+                            endGame();
+                            return;
+                        }
                     }
-                    scoreDisplay.textContent = `Rolas: ${score}`; // Atualiza o display da pontuação
-                    obj.remove(); // Remove o objeto do DOM
-                    rolas.splice(i, 1); // Remove o objeto do array
+                    scoreDisplay.textContent = `Rolas: ${score}`;
+                    obj.remove();
+                    rolas.splice(i, 1);
 
-                    // Reseta a animação da boca após um curto atraso
                     setTimeout(() => {
-                        character.style.backgroundImage = `url(${currentCharacterMouthClosedImage})`; // Fecha a boca
-                        character.classList.remove('character-eating'); // Remove classe do efeito de "salto"
-                    }, 300); // Duração da animação de boca aberta e salto
+                        character.style.backgroundImage = `url(${currentCharacterMouthClosedImage})`;
+                        character.classList.remove('character-eating');
+                    }, 300);
                 }
 
-                // Remove o objeto se ele sair da tela (atingir a parte inferior)
                 if (obj.y > gameContainerHeight) {
-                    obj.remove(); // Remove do DOM
-                    rolas.splice(i, 1); // Remove do array
-                    // Não há penalidade por deixar cair, apenas por pegar o errado
+                    obj.remove();
+                    rolas.splice(i, 1);
                 }
             }
 
-            // Solicita o próximo quadro de animação (loop contínuo)
-            requestAnimationFrame(gameLoop);
+            gameLoopRAF = requestAnimationFrame(gameLoop);
         }
 
         // --- Função de Fim de Jogo ---
-        function endGame() {
+        async function endGame() { // async para salvar o score
             gameRunning = false;
             gameOver = true;
-            clearInterval(rolaGenerationInterval); // Para a geração de novos objetos
-            // Remove todos os objetos caindo atualmente na tela
-            rolas.forEach(obj => obj.remove());
-            rolas = []; // Limpa o array de objetos
+            if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
+            if (gameLoopRAF) cancelAnimationFrame(gameLoopRAF);
 
-            finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`; // Exibe a pontuação final
-            gameOverScreen.style.display = 'flex'; // Mostra a tela de fim de jogo
-            audioToggleButton.textContent = 'Gemidos: OFF'; // Reseta o texto do botão
-            isSoundEnabled = false; // Desativa o som ao terminar o jogo
+            document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
+            rolas = [];
+
+            finalScoreDisplay.textContent = `Sua Pontuação Final: ${score}`;
+            gameOverScreen.style.display = 'flex';
+            audioToggleButton.textContent = 'Gemidos: OFF';
+            isSoundEnabled = false;
+
+            // Salvar pontuação no Firestore
+            const currentNick = getCurrentNickname();
+            if (currentNick) {
+                await saveScore(currentNick, score);
+                console.log("Score salvo no ranking!");
+            } else {
+                console.warn("Nickname não definido. Pontuação não será salva no ranking.");
+            }
         }
 
         // --- Eventos de Carregamento e Redimensionamento ---
-
-        // Inicializa o menu principal ao carregar a janela
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+            await initializeFirebaseAndAuth(); // Inicializa Firebase ao carregar a página
             showMainMenu();
         });
 
-        // Lida com o redimensionamento da janela para manter o jogo responsivo
         window.addEventListener('resize', () => {
-            // Apenas recalcula se o jogo estiver rodando ou em uma tela de menu/seleção
-            if (gameRunning || mainMenu.style.display === 'flex' || characterSelectScreen.style.display === 'flex') {
-                initializeCharacterPosition(); // Recalcula a posição do personagem
-
-                // Ajusta a posição dos objetos se eles ficarem fora dos limites horizontais após o redimensionamento
+            if (gameRunning || mainMenu.style.display === 'flex' || characterSelectScreen.style.display === 'flex' || profileRankingScreen.style.display === 'flex') {
+                initializeCharacterPosition();
                 rolas.forEach(obj => {
-                    // Agora, todos os rolas têm o mesmo tamanho padrão
                     const objWidth = obj.offsetWidth || 100;
                     if (obj.x + objWidth > gameContainer.offsetWidth) {
                         obj.x = gameContainer.offsetWidth - objWidth;
