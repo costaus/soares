@@ -364,6 +364,20 @@
             line-height: 1.2;
         }
 
+        #unlock-m { /* Estilo para a letra 'M' clicável */
+            cursor: pointer;
+            /* REMOVIDO: Estilos visuais para manter o segredo */
+            /* color: #00FFFF; */ 
+            /* text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF; */
+            /* transition: transform 0.1s ease-in-out; */
+            /* display: inline-block; */
+        }
+
+        /* REMOVIDO: Efeito ao clicar para manter o segredo */
+        /* #unlock-m:active {
+            transform: scale(1.1);
+        } */
+
         .character-selection-container {
             display: flex;
             justify-content: space-evenly;
@@ -453,27 +467,6 @@
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
-        /* Estilos do input de glitch */
-        #glitch-input {
-            position: absolute;
-            bottom: 10px; /* Posição na parte inferior */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px; /* Largura discreta */
-            padding: 5px 10px;
-            font-size: 0.9em;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 5px;
-            text-align: center;
-            z-index: 10; /* Acima de outros elementos */
-        }
-        #glitch-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-
         /* Ajustes responsivos */
         @media (max-width: 768px) {
             #game-container {
@@ -554,11 +547,6 @@
                 font-size: 1.2em;
                 margin-top: 30px;
             }
-            #glitch-input {
-                font-size: 0.8em;
-                width: 120px;
-                bottom: 5px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -637,9 +625,6 @@
                 font-size: 0.9em;
             }
             /* FIM DOS AJUSTES PARA A TELA DE SELEÇÃO DE PERSONAGEM */
-            #glitch-input { /* Removido, mas mantendo o estilo para referência */
-                display: none;
-            }
         }
     </style>
 </head>
@@ -654,7 +639,7 @@
 
         <!-- Tela de Seleção de Personagem -->
         <div id="character-select-screen">
-            <h2>Escolha seu Pe<span id="unlock-m">M</span>sonagem</h2> <!-- 'M' AGORA É CLICÁVEL -->
+            <h2>Escolha seu Perso<span id="unlock-m">n</span>age<span id="unlock-m-final">m</span></h2> <!-- CORRIGIDO: 'n' normal, 'm' final clicável -->
             <div class="character-selection-container">
                 <div class="character-card" data-character-id="carlinha">
                     <img src="https://files.catbox.moe/xyhrnx.png" alt="Carlinha Catatau">
@@ -665,7 +650,6 @@
                     <h3>Eduardo Vício Pinto</h3>
                 </div>
             </div>
-            <!-- REMOVIDO: Input de glitch -->
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -713,7 +697,8 @@
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
         const characterCards = document.querySelectorAll('.character-card');
-        const unlockM = document.getElementById('unlock-m'); // Referência à letra 'M'
+        // CORRIGIDO: Agora a referência é para a letra 'M' final
+        const unlockM = document.getElementById('unlock-m-final'); 
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
@@ -917,7 +902,7 @@
             });
         });
 
-        // Event Listener para a letra 'M' (Glitch)
+        // Event Listener para a letra 'M' final (Glitch)
         unlockM.addEventListener('click', () => {
             if (!isCarlinhaUnlocked) {
                 isCarlinhaUnlocked = true;
@@ -1022,7 +1007,7 @@
             const characterTop = characterBottom - characterHeight;
 
             const mouthOpenTriggerDistance = 80; // Distância para a boca abrir
-            const collisionOverlapThreshold = 1; // AJUSTADO: Limite de sobreposição para considerar colisão (em pixels)
+            const collisionOverlapThreshold = 1; // Limite de sobreposição para considerar colisão (em pixels)
 
             const zIndexBehindCharacter = 3;
             const zIndexInFrontOfCharacter = 6;
@@ -1041,10 +1026,9 @@
                 const objBottom = obj.y + objHeight;
 
                 // Lógica para abrir a boca antes da colisão (visual)
-                // A boca abre quando a parte inferior da rola está a mouthOpenTriggerDistance da parte superior do personagem
                 if (!obj.mouthOpenTriggered &&
                     objBottom > (characterTop - mouthOpenTriggerDistance) &&
-                    objBottom < characterTop + (characterHeight / 2) && /* Garante que esteja acima do meio do personagem */
+                    objBottom < characterTop + (characterHeight / 2) &&
                     objRight > characterX &&
                     objLeft < (characterX + characterWidth)) {
 
@@ -1054,7 +1038,6 @@
                 }
 
                 // Lógica de z-index para efeito de "camadas"
-                // Se a rola está abaixo do topo do personagem (ou seja, "passando por trás")
                 if (objBottom > characterTop + (characterHeight / 4) && objTop < characterBottom) {
                     obj.style.zIndex = zIndexBehindCharacter;
                 } else {
@@ -1064,10 +1047,10 @@
 
                 // --- Detecção de Colisão REAL (para pontuar/penalizar) ---
                 // Verifica se há sobreposição significativa para considerar a colisão
-                if (objRight > characterX + collisionOverlapThreshold &&
-                    objLeft < (characterX + characterWidth) - collisionOverlapThreshold &&
-                    objBottom > characterTop + collisionOverlapThreshold &&
-                    objTop < characterBottom - collisionOverlapThreshold) {
+                const horizontalOverlap = Math.max(0, Math.min(objRight, characterX + characterWidth) - Math.max(objLeft, characterX));
+                const verticalOverlap = Math.max(0, Math.min(objBottom, characterTop + characterHeight) - Math.max(objTop, characterTop));
+
+                if (horizontalOverlap > collisionOverlapThreshold && verticalOverlap > collisionOverlapThreshold) {
                     
                     if (obj.classList.contains('rola')) {
                         score += 3;
