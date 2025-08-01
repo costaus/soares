@@ -636,12 +636,10 @@
             .character-card h3 {
                 font-size: 0.9em;
             }
-            #glitch-input {
-                font-size: 0.7em;
-                width: 100px;
-                bottom: 5px;
-            }
             /* FIM DOS AJUSTES PARA A TELA DE SELEÇÃO DE PERSONAGEM */
+            #glitch-input { /* Removido, mas mantendo o estilo para referência */
+                display: none;
+            }
         }
     </style>
 </head>
@@ -656,7 +654,7 @@
 
         <!-- Tela de Seleção de Personagem -->
         <div id="character-select-screen">
-            <h2>Escolha seu Personagem</h2>
+            <h2>Escolha seu Pe<span id="unlock-m">M</span>sonagem</h2> <!-- 'M' AGORA É CLICÁVEL -->
             <div class="character-selection-container">
                 <div class="character-card" data-character-id="carlinha">
                     <img src="https://files.catbox.moe/xyhrnx.png" alt="Carlinha Catatau">
@@ -667,7 +665,7 @@
                     <h3>Eduardo Vício Pinto</h3>
                 </div>
             </div>
-            <input type="text" id="glitch-input" placeholder="Código Secreto">
+            <!-- REMOVIDO: Input de glitch -->
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -715,7 +713,7 @@
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
         const characterCards = document.querySelectorAll('.character-card');
-        const glitchInput = document.getElementById('glitch-input'); // Novo elemento
+        const unlockM = document.getElementById('unlock-m'); // Referência à letra 'M'
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
@@ -723,7 +721,7 @@
 
         // Variável de controle global para o áudio
         let isSoundEnabled = true; 
-        let isCarlinhaUnlocked = false; // Nova flag para o glitch da Carlinha
+        let isCarlinhaUnlocked = false; // Flag para o desbloqueio da Carlinha
 
         // --- URLs das Imagens ---
         const ROLA_IMAGES = [
@@ -829,8 +827,7 @@
             isSoundEnabled = false;
             if (gameLoopRAF) cancelAnimationFrame(gameLoopRAF);
             if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
-            isCarlinhaUnlocked = false; // Reseta o glitch da Carlinha
-            glitchInput.value = ''; // Limpa o input do glitch
+            isCarlinhaUnlocked = false; // Reseta o status de desbloqueio da Carlinha
         }
 
         function showCharacterSelectScreen() {
@@ -920,16 +917,13 @@
             });
         });
 
-        // Glitch Input Listener
-        glitchInput.addEventListener('input', () => {
-            if (glitchInput.value.toLowerCase() === 'elite') {
+        // Event Listener para a letra 'M' (Glitch)
+        unlockM.addEventListener('click', () => {
+            if (!isCarlinhaUnlocked) {
                 isCarlinhaUnlocked = true;
                 alert('Carlinha Catatau ativada! Personagem disponível.');
-                glitchInput.value = ''; // Limpa o input
-                glitchInput.style.display = 'none'; // Esconde o input após o glitch
             }
         });
-
 
         // --- Controle de Áudio de Fundo (agora controla todos os sons) ---
         audioToggleButton.addEventListener('click', () => {
@@ -1028,7 +1022,7 @@
             const characterTop = characterBottom - characterHeight;
 
             const mouthOpenTriggerDistance = 80; // Distância para a boca abrir
-            const collisionOverlapThreshold = 5; // AJUSTADO: Limite de sobreposição para considerar colisão (em pixels)
+            const collisionOverlapThreshold = 1; // AJUSTADO: Limite de sobreposição para considerar colisão (em pixels)
 
             const zIndexBehindCharacter = 3;
             const zIndexInFrontOfCharacter = 6;
