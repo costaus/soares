@@ -7,183 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- Tone.js para geração de áudio (mantido para os sons de penalidade) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
-
-    <!-- Firebase CDN Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global Firebase instances
-        let app;
-        let db;
-        let auth;
-        let currentUserId = null; // To store the authenticated user's UID or anonymous ID
-        let currentNickname = "Jogador Anônimo"; // Default nickname
-
-        // Function to initialize Firebase and authenticate
-        async function initializeFirebaseAndAuth() {
-            if (app) return; // Already initialized
-
-            // Use __app_id and __firebase_config provided by the Canvas environment
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Fallback if not provided
-
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            // Authenticate user
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                    console.log("Firebase: User is signed in with UID:", currentUserId);
-                    // Load nickname if exists
-                    const loadedNick = await loadNickname();
-                    if (loadedNick) {
-                        currentNickname = loadedNick;
-                        document.getElementById('nickname-input').value = currentNickname;
-                    } else {
-                        document.getElementById('nickname-input').value = "Jogador Anônimo"; // Default if no saved nick
-                    }
-                    displayTopScores(); // Display scores after auth and nickname load
-                } else {
-                    console.log("Firebase: No user is signed in. Signing in anonymously...");
-                    try {
-                        // Use __initial_auth_token if provided by the Canvas environment
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Firebase Auth Error:", error);
-                        // Fallback to a random ID if anonymous sign-in fails
-                        currentUserId = crypto.randomUUID();
-                        document.getElementById('nickname-input').value = "Jogador Anônimo";
-                        displayTopScores(); // Try to display scores even if auth failed
-                    }
-                }
-            });
-        }
-
-        // Firestore functions for nickname and scores
-        async function saveNickname(nickname) {
-            if (!db || !currentUserId) {
-                console.error("Firestore not initialized or user not authenticated.");
-                return;
-            }
-            try {
-                // Store nickname in a subcollection under the user's UID
-                const userDocRef = doc(db, `artifacts/${__app_id}/users/${currentUserId}/profile`, 'nickname');
-                await setDoc(userDocRef, { nickname: nickname }, { merge: true });
-                currentNickname = nickname; // Update global nickname
-                console.log("Nickname saved:", nickname);
-            } catch (e) {
-                console.error("Error saving nickname:", e);
-            }
-        }
-
-        async function loadNickname() {
-            if (!db || !currentUserId) {
-                console.error("Firestore not initialized or user not authenticated.");
-                return null;
-            }
-            try {
-                const userDocRef = doc(db, `artifacts/${__app_id}/users/${currentUserId}/profile`, 'nickname');
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    return docSnap.data().nickname;
-                } else {
-                    console.log("No nickname found for this user.");
-                    return null;
-                }
-            } catch (e) {
-                console.error("Error loading nickname:", e);
-                return null;
-            }
-        }
-
-        async function saveScore(nickname, score) {
-            if (!db || !currentUserId) {
-                console.error("Firestore not initialized or user not authenticated.");
-                return;
-            }
-            try {
-                // Save scores to a public collection
-                await addDoc(collection(db, `artifacts/${__app_id}/public/data/scores`), {
-                    nickname: nickname,
-                    score: score,
-                    timestamp: Date.now() // For ordering by recency if scores are tied
-                });
-                console.log("Score saved:", score);
-            } catch (e) {
-                console.error("Error saving score:", e);
-            }
-        }
-
-        async function getTopScores() {
-            if (!db) {
-                console.error("Firestore not initialized.");
-                return [];
-            }
-            try {
-                const scoresRef = collection(db, `artifacts/${__app_id}/public/data/scores`);
-                const q = query(scoresRef, orderBy("score", "desc"), orderBy("timestamp", "desc"), limit(5)); // Top 5 scores, then by recency
-                const querySnapshot = await getDocs(q);
-                const topScores = [];
-                querySnapshot.forEach((doc) => {
-                    topScores.push(doc.data());
-                });
-                return topScores;
-            } catch (e) {
-                console.error("Error getting top scores:", e);
-                return [];
-            }
-        }
-
-        async function displayTopScores() {
-            const topScores = await getTopScores();
-            const rankingList = document.getElementById('ranking-list');
-            rankingList.innerHTML = ''; // Clear previous list
-
-            if (topScores.length === 0) {
-                rankingList.innerHTML = '<li class="text-center text-gray-400">Nenhum recorde ainda. Seja o primeiro!</li>';
-                return;
-            }
-
-            topScores.forEach((scoreEntry, index) => {
-                const listItem = document.createElement('li');
-                listItem.className = 'flex justify-between items-center py-2 px-4 rounded-lg mb-2';
-                // Add different styles for top 3
-                if (index === 0) listItem.classList.add('bg-yellow-700', 'text-yellow-100', 'font-extrabold', 'shadow-lg');
-                else if (index === 1) listItem.classList.add('bg-gray-600', 'text-gray-200', 'font-bold');
-                else if (index === 2) listItem.classList.add('bg-amber-700', 'text-amber-100', 'font-semibold');
-                else listItem.classList.add('bg-gray-800', 'text-white');
-
-                listItem.innerHTML = `
-                    <span class="text-lg">${index + 1}. ${scoreEntry.nickname}</span>
-                    <span class="text-xl">${scoreEntry.score}</span>
-                `;
-                rankingList.appendChild(listItem);
-            });
-        }
-
-        // Expose global variables and functions to the main script
-        window.initializeFirebaseAndAuth = initializeFirebaseAndAuth;
-        window.saveNickname = saveNickname;
-        window.loadNickname = loadNickname;
-        window.saveScore = saveScore;
-        window.getTopScores = getTopScores;
-        window.displayTopScores = displayTopScores;
-        window.getCurrentNickname = () => currentNickname;
-        window.setCurrentNickname = (nick) => { currentNickname = nick; }; // Allow setting nickname from main script
-    </script>
-
     <style>
         /* Estilos gerais do corpo da página */
         body {
             margin: 0;
+            /* Usar 100dvh para garantir que a altura da viewport dinâmica seja usada,
+               considerando as barras de navegação do navegador */
             min-height: 100dvh; 
             display: flex;
             justify-content: center;
@@ -193,7 +22,7 @@
             color: white;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
+            overflow: hidden; /* Garante que não haja rolagem no body */
         }
 
         /* Estilos do contêiner principal do jogo */
@@ -201,7 +30,9 @@
             position: relative;
             width: 95%;
             max-width: 900px;
-            height: calc(100dvh - 40px);
+            /* Ajuste da altura para subtrair espaço das barras de navegação e garantir que caiba na tela.
+               O 100dvh é a altura total da viewport, e subtraímos um valor para margem/padding. */
+            height: calc(100dvh - 40px); /* Ajustado para caber na tela sem rolagem */
             background-color: #333;
             border-radius: 30px;
             overflow: hidden;
@@ -213,6 +44,11 @@
             justify-content: center;
             padding: 10px;
             box-sizing: border-box;
+            /* Fundo do jogo com a imagem fornecida */
+            background-image: url('https://iili.io/FUu2yhv.jpg'); /* URL CORRETA DO FUNDO */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         /* Estilos da tela de início do jogo */
@@ -408,7 +244,7 @@
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
-        /* Estilos da tela de seleção de jogo (Menu Principal) */
+        /* Estilos da tela de seleção de jogo (Menu Principal) - AJUSTADO */
         #main-menu {
             position: absolute;
             top: 0;
@@ -424,6 +260,8 @@
             border-radius: 30px;
             text-align: center;
             box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         #main-menu h1 {
@@ -434,6 +272,7 @@
             letter-spacing: 5px;
             text-transform: uppercase;
             font-weight: 900;
+            line-height: 1.2;
         }
 
         .menu-button {
@@ -502,7 +341,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.98);
-            display: none;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -522,6 +361,7 @@
             text-transform: uppercase;
             font-weight: 900;
             padding-top: 50px;
+            line-height: 1.2;
         }
 
         .character-selection-container {
@@ -531,7 +371,7 @@
             width: 100%;
             max-width: 900px;
             margin-bottom: 50px;
-            flex-wrap: nowrap;
+            flex-wrap: nowrap; /* Garante que fiquem lado a lado em telas maiores */
             height: 60%;
         }
 
@@ -613,136 +453,6 @@
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
-        /* Estilos da tela de perfil/ranking */
-        #profile-ranking-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.98);
-            display: none; /* Escondido por padrão */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 101;
-            border-radius: 25px;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        #profile-ranking-screen h2 {
-            font-size: 3.5em;
-            margin-bottom: 30px;
-            color: #FFD700;
-            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 900;
-        }
-
-        #nickname-input-container {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #nickname-input {
-            padding: 10px 15px;
-            font-size: 1.5em;
-            border-radius: 10px;
-            border: 2px solid #ff69b4;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            text-align: center;
-            margin-bottom: 15px;
-            max-width: 250px;
-        }
-
-        #nickname-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        #save-nickname-button {
-            padding: 12px 25px;
-            font-size: 1.2em;
-            background: linear-gradient(145deg, #ff1493, #ff69b4);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            transition: all 0.2s ease;
-        }
-
-        #save-nickname-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-        }
-
-        #ranking-section {
-            width: 90%;
-            max-width: 400px;
-            background-color: rgba(50, 50, 50, 0.7);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            margin-top: 30px;
-        }
-
-        #ranking-section h3 {
-            font-size: 2em;
-            color: #FFD700;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
-        }
-
-        #ranking-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        #ranking-list li {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            padding: 10px 15px;
-            font-size: 1.1em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #ranking-list li:last-child {
-            margin-bottom: 0;
-        }
-
-        #ranking-list li span:first-child {
-            font-weight: bold;
-        }
-
-        #play-game-from-profile-button {
-            margin-top: 40px;
-            padding: 15px 30px;
-            font-size: 1.8em;
-            background: linear-gradient(145deg, #ff1493, #ff69b4);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-            transition: all 0.2s ease;
-        }
-
-        #play-game-from-profile-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-        }
-
-
         /* Ajustes responsivos */
         @media (max-width: 768px) {
             #game-container {
@@ -817,6 +527,20 @@
                 width: 98%;
                 height: calc(100dvh - 20px);
             }
+            /* AJUSTES PARA A TELA MAIN-MENU EM SMARTPHONES */
+            #main-menu h1 {
+                font-size: 2.2em;
+                margin-bottom: 40px;
+                padding-top: 20px;
+            }
+            .menu-button {
+                padding: 15px 30px;
+                font-size: 1.5em;
+                min-width: 250px;
+                margin: 15px;
+            }
+            /* FIM DOS AJUSTES PARA A TELA MAIN-MENU */
+
             #start-screen h1, #game-over-screen h2 {
                 font-size: 2.5em;
             }
@@ -850,36 +574,30 @@
             #game-over-screen p {
                 font-size: 1.2em;
             }
-            /* Profile/Ranking Screen Adjustments */
-            #profile-ranking-screen h2 {
-                font-size: 2.2em;
-                margin-bottom: 15px;
+            /* AJUSTES PARA A TELA DE SELEÇÃO DE PERSONAGEM EM SMARTPHONES */
+            #character-select-screen h2 {
+                font-size: 2.2em; /* Reduzido */
+                margin-bottom: 20px; /* Reduzido */
+                padding-top: 10px; /* Ajustado */
             }
-            #nickname-input {
-                font-size: 1em;
-                max-width: 180px;
+            .character-selection-container {
+                flex-direction: column; /* Empilha verticalmente */
+                gap: 20px; /* Espaçamento entre os cards */
+                height: auto; /* Altura automática */
             }
-            #save-nickname-button {
-                font-size: 0.9em;
-                padding: 8px 15px;
+            .character-card {
+                width: 100%; /* Ocupa a largura total na coluna */
+                max-width: 200px; /* Limite para não ficar gigante */
+                margin-bottom: 20px; /* Mais espaço entre os cards */
             }
-            #ranking-section {
-                width: 98%;
-                padding: 10px;
-                margin-top: 20px;
+            .character-card img {
+                width: 120px; /* Reduzido para caber melhor */
+                height: 120px; /* Reduzido para caber melhor */
             }
-            #ranking-section h3 {
-                font-size: 1.2em;
+            .character-card h3 {
+                font-size: 1em; /* Reduzido */
             }
-            #ranking-list li {
-                font-size: 0.8em;
-                padding: 6px 10px;
-            }
-            #play-game-from-profile-button {
-                font-size: 1.1em;
-                padding: 10px 20px;
-                margin-top: 30px;
-            }
+            /* FIM DOS AJUSTES PARA A TELA DE SELEÇÃO DE PERSONAGEM */
         }
     </style>
 </head>
@@ -892,8 +610,8 @@
             <button id="pica-man-button" class="menu-button">PICA-MAN (Em Breve)</button>
         </div>
 
-        <!-- Tela de Perfil/Ranking -->
-        <div id="profile-ranking-screen">
+        <!-- Tela de Perfil/Ranking (Temporariamente removida para depuração visual) -->
+        <!-- <div id="profile-ranking-screen">
             <h2>Seu Perfil e Ranking</h2>
             <div id="nickname-input-container">
                 <input type="text" id="nickname-input" placeholder="Seu Nickname" maxlength="15">
@@ -902,12 +620,11 @@
             <div id="ranking-section">
                 <h3>Top 5 Pontuações</h3>
                 <ul id="ranking-list">
-                    <!-- Ranking items will be inserted here by JavaScript -->
                     <li>Carregando ranking...</li>
                 </ul>
             </div>
             <button id="play-game-from-profile-button" class="menu-button">Jogar Comedor de Rolas</button>
-        </div>
+        </div> -->
 
         <!-- Tela de Seleção de Personagem -->
         <div id="character-select-screen">
@@ -942,7 +659,7 @@
                 <h2>Fim de Jogo!</h2>
                 <p id="final-score">Sua Pontuação Final: 0</p>
                 <button id="restart-button">Jogar Novamente</button>
-                <button id="view-ranking-button" class="menu-button">Ver Ranking</button> <!-- Novo botão -->
+                <!-- <button id="view-ranking-button" class="menu-button">Ver Ranking</button> --> <!-- Temporariamente removido -->
             </div>
              <!-- Botão de controle de áudio de fundo -->
             <button id="audio-toggle-button">Gemidos: OFF</button>
@@ -950,15 +667,9 @@
     </div>
 
     <script type="module">
-        // Importa as funções globais do script Firebase (definidas no head)
-        const initializeFirebaseAndAuth = window.initializeFirebaseAndAuth;
-        const saveNickname = window.saveNickname;
-        const loadNickname = window.loadNickname;
-        const saveScore = window.saveScore;
-        const getTopScores = window.getTopScores;
-        const displayTopScores = window.displayTopScores;
-        const getCurrentNickname = window.getCurrentNickname;
-        const setCurrentNickname = window.setCurrentNickname;
+        // IMPORTANTE: Removi as importações e lógica do Firebase/Ranking deste script principal
+        // para garantir que o jogo base funcione perfeitamente.
+        // A lógica do ranking será reintegrada APÓS a confirmação de que o jogo está 100% visualmente e funcionalmente.
 
         // --- Referências aos Elementos HTML ---
         const gameContainer = document.getElementById('game-container');
@@ -970,7 +681,7 @@
         const gameOverScreen = document.getElementById('game-over-screen');
         const finalScoreDisplay = document.getElementById('final-score');
         const restartButton = document.getElementById('restart-button');
-        const viewRankingButton = document.getElementById('view-ranking-button'); // Novo botão
+        // REMOVIDO: const viewRankingButton = document.getElementById('view-ranking-button');
 
         // Elementos do Menu Principal
         const mainMenu = document.getElementById('main-menu');
@@ -978,11 +689,11 @@
         const picaManButton = document.getElementById('pica-man-button');
         const caiRolaGameWrapper = document.getElementById('cai-rola-game-wrapper');
 
-        // Elementos da Tela de Perfil/Ranking
-        const profileRankingScreen = document.getElementById('profile-ranking-screen');
-        const nicknameInput = document.getElementById('nickname-input');
-        const saveNicknameButton = document.getElementById('save-nickname-button');
-        const playGameFromProfileButton = document.getElementById('play-game-from-profile-button');
+        // REMOVIDO: Elementos da Tela de Perfil/Ranking
+        // const profileRankingScreen = document.getElementById('profile-ranking-screen');
+        // const nicknameInput = document.getElementById('nickname-input');
+        // const saveNicknameButton = document.getElementById('save-nickname-button');
+        // const playGameFromProfileButton = document.getElementById('play-game-from-profile-button');
 
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
@@ -1013,8 +724,8 @@
             'eduardo': {
                 name: 'Eduardo Vício Pinto',
                 selectionImage: 'https://files.catbox.moe/fvn4j3.png',
-                closedMouthImage: 'https://files.catbox.moe/1aae2b.png',
-                openMouthImage: 'https://files.catbox.moe/olc9ni.png'
+                closedMouthImage: 'https://files.catbox.moe/1aae2b.png', // Dudu boca fechada (NOVA IMAGEM)
+                openMouthImage: 'https://files.catbox.moe/olc9ni.png' // Dudu boca aberta
             }
         };
 
@@ -1044,11 +755,16 @@
         let penaltySynth;
 
         function setupAudioEffects() {
-            penaltySynth = new Tone.Synth({
-                oscillator: { type: "sawtooth" },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.3 },
-                volume: -8
-            }).toDestination();
+            // Verifica se Tone.js está carregado antes de usar
+            if (typeof Tone !== 'undefined') {
+                penaltySynth = new Tone.Synth({
+                    oscillator: { type: "sawtooth" },
+                    envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.3 },
+                    volume: -8
+                }).toDestination();
+            } else {
+                console.warn("Tone.js não carregado. Efeitos sonoros de penalidade desativados.");
+            }
         }
 
         function playCollectSound() {
@@ -1059,7 +775,7 @@
         }
 
         function playPenaltySound() {
-            if (isSoundEnabled) {
+            if (isSoundEnabled && typeof Tone !== 'undefined' && penaltySynth) {
                 if (Tone.context.state !== 'running') {
                     Tone.start();
                 }
@@ -1083,7 +799,7 @@
             mainMenu.style.display = 'none';
             caiRolaGameWrapper.style.display = 'none';
             characterSelectScreen.style.display = 'none';
-            profileRankingScreen.style.display = 'none';
+            // REMOVIDO: profileRankingScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             startScreen.style.display = 'none';
             audioToggleButton.style.display = 'none';
@@ -1098,24 +814,11 @@
             if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
         }
 
-        async function showProfileRankingScreen() {
-            hideAllScreens();
-            profileRankingScreen.style.display = 'flex';
-            // Load nickname and display it
-            const loadedNick = await loadNickname();
-            if (loadedNick) {
-                nicknameInput.value = loadedNick;
-                setCurrentNickname(loadedNick); // Update global nickname
-            } else {
-                nicknameInput.value = "Jogador Anônimo";
-                setCurrentNickname("Jogador Anônimo");
-            }
-            displayTopScores(); // Display current ranking
-        }
+        // REMOVIDO: showProfileRankingScreen (será reintegrada depois)
 
         function showCharacterSelectScreen() {
             hideAllScreens();
-            caiRolaGameWrapper.style.display = 'block'; // Wrapper precisa estar visível
+            caiRolaGameWrapper.style.display = 'block';
             characterSelectScreen.style.display = 'flex';
             characterCards.forEach(card => card.classList.remove('selected'));
             selectedCharacterId = null;
@@ -1123,7 +826,7 @@
 
         function showCaiRolaGameScreen() {
             hideAllScreens();
-            caiRolaGameWrapper.style.display = 'block'; // Wrapper precisa estar visível
+            caiRolaGameWrapper.style.display = 'block';
             startScreen.style.display = 'flex';
             audioToggleButton.style.display = 'block';
         }
@@ -1137,9 +840,9 @@
 
             // --- RESET DE ESTADO DO JOGO ---
             score = 0;
-            lives = 3; // REINTRODUZIDO
+            lives = 3;
             scoreDisplay.textContent = `Rolas: ${score}`;
-            livesDisplay.textContent = `Vidas: ${lives}`; // REINTRODUZIDO
+            livesDisplay.textContent = `Vidas: ${lives}`;
             
             if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
             document.querySelectorAll('.rola, .penalty-object').forEach(obj => obj.remove());
@@ -1147,9 +850,9 @@
 
             if (gameLoopRAF) cancelAnimationFrame(gameLoopRAF);
 
-            hideAllScreens(); // Esconde todas as telas antes de mostrar o jogo
-            caiRolaGameWrapper.style.display = 'block'; // Mostra o wrapper do jogo
-            audioToggleButton.style.display = 'block'; // Mostra o botão de áudio
+            hideAllScreens();
+            caiRolaGameWrapper.style.display = 'block';
+            audioToggleButton.style.display = 'block';
             
             gameRunning = true;
             gameOver = false;
@@ -1164,7 +867,7 @@
 
         // --- Event Listeners para Botões ---
         caiRolaButton.addEventListener('click', () => {
-            showProfileRankingScreen(); // Vai para a tela de perfil/ranking
+            showCharacterSelectScreen();
             if (!penaltySynth) {
                 setupAudioEffects();
             }
@@ -1175,8 +878,7 @@
         });
 
         startButton.addEventListener('click', startCaiRolaGame);
-        restartButton.addEventListener('click', startCaiRolaGame); // Botão de reiniciar agora funciona
-        viewRankingButton.addEventListener('click', showProfileRankingScreen); // Novo botão
+        restartButton.addEventListener('click', startCaiRolaGame);
 
         // Event Listeners para os CARDS de seleção de personagem
         characterCards.forEach(card => {
@@ -1184,30 +886,17 @@
                 characterCards.forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
 
-                selectedCharacterId = card.dataset.characterId;
+                // CORREÇÃO: Acessar data-character-id corretamente
+                selectedCharacterId = card.dataset.characterId; 
                 const selectedChar = characterData[selectedCharacterId];
                 
                 currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
                 currentCharacterMouthOpenImage = selectedChar.openMouthImage;
 
-                // INICIA O JOGO DIRETAMENTE APÓS A SELEÇÃO
                 showCaiRolaGameScreen(); 
                 startCaiRolaGame(); 
             });
         });
-
-        // Event Listeners para a tela de Perfil/Ranking
-        saveNicknameButton.addEventListener('click', () => {
-            const newNickname = nicknameInput.value.trim();
-            if (newNickname) {
-                saveNickname(newNickname);
-                displayTopScores(); // Refresh ranking after saving nickname
-            } else {
-                alert("Por favor, digite um nickname válido.");
-            }
-        });
-
-        playGameFromProfileButton.addEventListener('click', showCharacterSelectScreen); // Leva para seleção de personagem
 
         // --- Controle de Áudio de Fundo (agora controla todos os sons) ---
         audioToggleButton.addEventListener('click', () => {
@@ -1272,7 +961,7 @@
 
             if (isPenalty) {
                 obj.classList.add('penalty-object');
-                obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`; // CORRIGIDO
+                obj.style.backgroundImage = `url(${PENALTY_IMAGE_URL})`;
             } else {
                 const rolaImageIndex = Math.floor(Math.random() * ROLA_IMAGES.length);
                 const selectedRolaImage = ROLA_IMAGES[rolaImageIndex];
@@ -1347,11 +1036,11 @@
                         playCollectSound();
                     } else if (obj.classList.contains('penalty-object')) {
                         score -= 30;
-                        lives--; // DECREMENTA VIDAS
-                        livesDisplay.textContent = `Vidas: ${lives}`; // ATUALIZA DISPLAY DE VIDAS
+                        lives--;
+                        livesDisplay.textContent = `Vidas: ${lives}`;
                         playPenaltySound();
 
-                        if (lives <= 0) { // VERIFICA SE AS VIDAS ACABARAM
+                        if (lives <= 0) {
                             endGame();
                             return;
                         }
@@ -1376,7 +1065,7 @@
         }
 
         // --- Função de Fim de Jogo ---
-        async function endGame() { // async para salvar o score
+        function endGame() {
             gameRunning = false;
             gameOver = true;
             if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
@@ -1389,25 +1078,15 @@
             gameOverScreen.style.display = 'flex';
             audioToggleButton.textContent = 'Gemidos: OFF';
             isSoundEnabled = false;
-
-            // Salvar pontuação no Firestore
-            const currentNick = getCurrentNickname();
-            if (currentNick) {
-                await saveScore(currentNick, score);
-                console.log("Score salvo no ranking!");
-            } else {
-                console.warn("Nickname não definido. Pontuação não será salva no ranking.");
-            }
         }
 
         // --- Eventos de Carregamento e Redimensionamento ---
-        window.addEventListener('load', async () => {
-            await initializeFirebaseAndAuth(); // Inicializa Firebase ao carregar a página
+        window.addEventListener('load', () => {
             showMainMenu();
         });
 
         window.addEventListener('resize', () => {
-            if (gameRunning || mainMenu.style.display === 'flex' || characterSelectScreen.style.display === 'flex' || profileRankingScreen.style.display === 'flex') {
+            if (gameRunning || mainMenu.style.display === 'flex' || characterSelectScreen.style.display === 'flex') {
                 initializeCharacterPosition();
                 rolas.forEach(obj => {
                     const objWidth = obj.offsetWidth || 100;
