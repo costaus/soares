@@ -105,8 +105,8 @@
         /* Estilos do display de pontuação */
         #score-display {
             position: absolute;
-            top: 15px; /* AJUSTADO */
-            left: 20px; /* AJUSTADO */
+            top: 15px;
+            left: 20px;
             font-size: 3.5em;
             font-weight: bold;
             color: #FFD700;
@@ -118,8 +118,8 @@
         /* Estilos do display de vidas */
         #lives-display {
             position: absolute;
-            top: 15px; /* AJUSTADO */
-            right: 20px; /* AJUSTADO */
+            top: 15px;
+            right: 20px;
             font-size: 3.5em;
             font-weight: bold;
             color: #FFD700;
@@ -313,11 +313,11 @@
         /* Botão de áudio */
         #audio-toggle-button {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            font-size: 1.2em;
+            top: 10px; /* AJUSTADO: Posicionado mais para cima */
+            left: 50%; /* Centralizado horizontalmente */
+            transform: translateX(-50%); /* Garante centralização */
+            padding: 8px 15px; /* AJUSTADO: Menor padding */
+            font-size: 1em; /* AJUSTADO: Fonte menor */
             background-color: rgba(0, 0, 0, 0.7);
             color: white;
             border: 2px solid #FFD700;
@@ -453,6 +453,27 @@
             background: linear-gradient(145deg, #ff69b4, #ff1493);
         }
 
+        /* Estilos do input de glitch */
+        #glitch-input {
+            position: absolute;
+            bottom: 10px; /* Posição na parte inferior */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px; /* Largura discreta */
+            padding: 5px 10px;
+            font-size: 0.9em;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            text-align: center;
+            z-index: 10; /* Acima de outros elementos */
+        }
+        #glitch-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+
         /* Ajustes responsivos */
         @media (max-width: 768px) {
             #game-container {
@@ -492,33 +513,51 @@
             #game-over-screen p {
                 font-size: 1.5em;
             }
-            /* Profile/Ranking Screen Adjustments */
-            #profile-ranking-screen h2 {
-                font-size: 2.8em;
-                margin-bottom: 20px;
+            /* Menu Principal Responsivo para Tablets */
+            #main-menu h1 {
+                font-size: 3.5em;
+                margin-bottom: 60px;
             }
-            #nickname-input {
-                font-size: 1.2em;
-                max-width: 200px;
+            .menu-button {
+                padding: 20px 45px;
+                font-size: 2.2em;
+                min-width: 300px;
+                margin: 20px;
             }
-            #save-nickname-button {
+            #audio-toggle-button {
                 font-size: 1em;
-                padding: 10px 20px;
+                padding: 8px 15px;
+                top: 10px; /* Ajustado para tablets */
             }
-            #ranking-section {
-                width: 95%;
-                padding: 15px;
+            /* Seleção de Personagem Responsiva para Tablets */
+            #character-select-screen h2 {
+                font-size: 3.5em;
+                margin-bottom: 40px;
+                padding-top: 15px;
             }
-            #ranking-section h3 {
+            .character-selection-container {
+                gap: 20px;
+                height: 50%;
+            }
+            .character-card {
+                max-width: 48%;
+            }
+            .character-card img {
+                width: 180px; /* AJUSTADO: Tamanho fixo para tablets */
+                height: 180px; /* AJUSTADO: Tamanho fixo para tablets */
+            }
+            .character-card h3 {
                 font-size: 1.5em;
             }
-            #ranking-list li {
-                font-size: 0.9em;
-                padding: 8px 12px;
-            }
-            #play-game-from-profile-button {
-                font-size: 1.4em;
+            #start-game-after-character-select {
                 padding: 12px 25px;
+                font-size: 1.2em;
+                margin-top: 30px;
+            }
+            #glitch-input {
+                font-size: 0.8em;
+                width: 120px;
+                bottom: 5px;
             }
         }
 
@@ -576,26 +615,31 @@
             }
             /* AJUSTES PARA A TELA DE SELEÇÃO DE PERSONAGEM EM SMARTPHONES */
             #character-select-screen h2 {
-                font-size: 2.2em; /* Reduzido */
-                margin-bottom: 20px; /* Reduzido */
-                padding-top: 10px; /* Ajustado */
+                font-size: 2.0em; /* Reduzido ainda mais */
+                margin-bottom: 20px;
+                padding-top: 10px;
             }
             .character-selection-container {
-                flex-direction: column; /* Empilha verticalmente */
-                gap: 20px; /* Espaçamento entre os cards */
-                height: auto; /* Altura automática */
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
             }
             .character-card {
-                width: 100%; /* Ocupa a largura total na coluna */
-                max-width: 200px; /* Limite para não ficar gigante */
-                margin-bottom: 20px; /* Mais espaço entre os cards */
+                width: 100%;
+                max-width: 180px;
+                margin-bottom: 20px;
             }
             .character-card img {
-                width: 120px; /* Reduzido para caber melhor */
-                height: 120px; /* Reduzido para caber melhor */
+                width: 120px;
+                height: 120px;
             }
             .character-card h3 {
-                font-size: 1em; /* Reduzido */
+                font-size: 0.9em;
+            }
+            #glitch-input {
+                font-size: 0.7em;
+                width: 100px;
+                bottom: 5px;
             }
             /* FIM DOS AJUSTES PARA A TELA DE SELEÇÃO DE PERSONAGEM */
         }
@@ -610,22 +654,6 @@
             <button id="pica-man-button" class="menu-button">PICA-MAN (Em Breve)</button>
         </div>
 
-        <!-- Tela de Perfil/Ranking (Temporariamente removida para depuração visual) -->
-        <!-- <div id="profile-ranking-screen">
-            <h2>Seu Perfil e Ranking</h2>
-            <div id="nickname-input-container">
-                <input type="text" id="nickname-input" placeholder="Seu Nickname" maxlength="15">
-                <button id="save-nickname-button">Salvar Nickname</button>
-            </div>
-            <div id="ranking-section">
-                <h3>Top 5 Pontuações</h3>
-                <ul id="ranking-list">
-                    <li>Carregando ranking...</li>
-                </ul>
-            </div>
-            <button id="play-game-from-profile-button" class="menu-button">Jogar Comedor de Rolas</button>
-        </div> -->
-
         <!-- Tela de Seleção de Personagem -->
         <div id="character-select-screen">
             <h2>Escolha seu Personagem</h2>
@@ -639,6 +667,7 @@
                     <h3>Eduardo Vício Pinto</h3>
                 </div>
             </div>
+            <input type="text" id="glitch-input" placeholder="Código Secreto">
         </div>
 
         <!-- Wrapper para o jogo "CAI ROLA" -->
@@ -659,7 +688,6 @@
                 <h2>Fim de Jogo!</h2>
                 <p id="final-score">Sua Pontuação Final: 0</p>
                 <button id="restart-button">Jogar Novamente</button>
-                <!-- <button id="view-ranking-button" class="menu-button">Ver Ranking</button> --> <!-- Temporariamente removido -->
             </div>
              <!-- Botão de controle de áudio de fundo -->
             <button id="audio-toggle-button">Gemidos: OFF</button>
@@ -667,10 +695,6 @@
     </div>
 
     <script type="module">
-        // IMPORTANTE: Removi as importações e lógica do Firebase/Ranking deste script principal
-        // para garantir que o jogo base funcione perfeitamente.
-        // A lógica do ranking será reintegrada APÓS a confirmação de que o jogo está 100% visualmente e funcionalmente.
-
         // --- Referências aos Elementos HTML ---
         const gameContainer = document.getElementById('game-container');
         const character = document.getElementById('character');
@@ -681,7 +705,6 @@
         const gameOverScreen = document.getElementById('game-over-screen');
         const finalScoreDisplay = document.getElementById('final-score');
         const restartButton = document.getElementById('restart-button');
-        // REMOVIDO: const viewRankingButton = document.getElementById('view-ranking-button');
 
         // Elementos do Menu Principal
         const mainMenu = document.getElementById('main-menu');
@@ -689,15 +712,10 @@
         const picaManButton = document.getElementById('pica-man-button');
         const caiRolaGameWrapper = document.getElementById('cai-rola-game-wrapper');
 
-        // REMOVIDO: Elementos da Tela de Perfil/Ranking
-        // const profileRankingScreen = document.getElementById('profile-ranking-screen');
-        // const nicknameInput = document.getElementById('nickname-input');
-        // const saveNicknameButton = document.getElementById('save-nickname-button');
-        // const playGameFromProfileButton = document.getElementById('play-game-from-profile-button');
-
         // Elementos da Tela de Seleção de Personagem
         const characterSelectScreen = document.getElementById('character-select-screen');
         const characterCards = document.querySelectorAll('.character-card');
+        const glitchInput = document.getElementById('glitch-input'); // Novo elemento
 
         // Elementos de áudio
         const audioToggleButton = document.getElementById('audio-toggle-button');
@@ -705,13 +723,14 @@
 
         // Variável de controle global para o áudio
         let isSoundEnabled = true; 
+        let isCarlinhaUnlocked = false; // Nova flag para o glitch da Carlinha
 
         // --- URLs das Imagens ---
         const ROLA_IMAGES = [
             'https://files.catbox.moe/n39c1e.png', // Rola 1
             'https://files.catbox.moe/qkukmd.png'  // Rola 3
         ];
-        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // CORRIGIDO: Imagem de penalidade
+        const PENALTY_IMAGE_URL = 'https://files.catbox.moe/0c0ea9.png'; // Imagem de penalidade
 
         // Dados dos Personagens - CORRIGIDO E VERIFICADO
         const characterData = {
@@ -755,7 +774,6 @@
         let penaltySynth;
 
         function setupAudioEffects() {
-            // Verifica se Tone.js está carregado antes de usar
             if (typeof Tone !== 'undefined') {
                 penaltySynth = new Tone.Synth({
                     oscillator: { type: "sawtooth" },
@@ -799,7 +817,6 @@
             mainMenu.style.display = 'none';
             caiRolaGameWrapper.style.display = 'none';
             characterSelectScreen.style.display = 'none';
-            // REMOVIDO: profileRankingScreen.style.display = 'none';
             gameOverScreen.style.display = 'none';
             startScreen.style.display = 'none';
             audioToggleButton.style.display = 'none';
@@ -812,9 +829,9 @@
             isSoundEnabled = false;
             if (gameLoopRAF) cancelAnimationFrame(gameLoopRAF);
             if (rolaGenerationInterval) clearInterval(rolaGenerationInterval);
+            isCarlinhaUnlocked = false; // Reseta o glitch da Carlinha
+            glitchInput.value = ''; // Limpa o input do glitch
         }
-
-        // REMOVIDO: showProfileRankingScreen (será reintegrada depois)
 
         function showCharacterSelectScreen() {
             hideAllScreens();
@@ -883,9 +900,8 @@
         // Event Listeners para os CARDS de seleção de personagem
         characterCards.forEach(card => {
             card.addEventListener('click', (event) => {
-                // CORREÇÃO: Verificar se é a Carlinha antes de prosseguir
                 const characterId = card.dataset.characterId;
-                if (characterId === 'carlinha') {
+                if (characterId === 'carlinha' && !isCarlinhaUnlocked) {
                     alert('Personagem desativado por direitos autorais.');
                     return; // Impede a seleção e o início do jogo
                 }
@@ -903,6 +919,17 @@
                 startCaiRolaGame(); 
             });
         });
+
+        // Glitch Input Listener
+        glitchInput.addEventListener('input', () => {
+            if (glitchInput.value.toLowerCase() === 'elite') {
+                isCarlinhaUnlocked = true;
+                alert('Carlinha Catatau ativada! Personagem disponível.');
+                glitchInput.value = ''; // Limpa o input
+                glitchInput.style.display = 'none'; // Esconde o input após o glitch
+            }
+        });
+
 
         // --- Controle de Áudio de Fundo (agora controla todos os sons) ---
         audioToggleButton.addEventListener('click', () => {
@@ -1000,7 +1027,9 @@
             const characterBottom = gameContainerHeight - 100;
             const characterTop = characterBottom - characterHeight;
 
-            const mouthOpenTriggerDistance = 80;
+            const mouthOpenTriggerDistance = 80; // Distância para a boca abrir
+            const collisionOverlapThreshold = 5; // AJUSTADO: Limite de sobreposição para considerar colisão (em pixels)
+
             const zIndexBehindCharacter = 3;
             const zIndexInFrontOfCharacter = 6;
 
@@ -1017,25 +1046,34 @@
                 const objTop = obj.y;
                 const objBottom = obj.y + objHeight;
 
-                if (objBottom > (characterTop - mouthOpenTriggerDistance) &&
-                    objBottom < characterTop + (characterHeight / 2) &&
+                // Lógica para abrir a boca antes da colisão (visual)
+                // A boca abre quando a parte inferior da rola está a mouthOpenTriggerDistance da parte superior do personagem
+                if (!obj.mouthOpenTriggered &&
+                    objBottom > (characterTop - mouthOpenTriggerDistance) &&
+                    objBottom < characterTop + (characterHeight / 2) && /* Garante que esteja acima do meio do personagem */
                     objRight > characterX &&
                     objLeft < (characterX + characterWidth)) {
 
-                    if (!obj.mouthOpenTriggered) {
-                        character.style.backgroundImage = `url(${currentCharacterMouthOpenImage})`;
-                        character.classList.add('character-eating');
-                        obj.mouthOpenTriggered = true;
-                    }
+                    character.style.backgroundImage = `url(${currentCharacterMouthOpenImage})`;
+                    character.classList.add('character-eating');
+                    obj.mouthOpenTriggered = true;
+                }
+
+                // Lógica de z-index para efeito de "camadas"
+                // Se a rola está abaixo do topo do personagem (ou seja, "passando por trás")
+                if (objBottom > characterTop + (characterHeight / 4) && objTop < characterBottom) {
                     obj.style.zIndex = zIndexBehindCharacter;
                 } else {
                     obj.style.zIndex = zIndexInFrontOfCharacter;
                 }
 
-                if (objRight > characterX &&
-                    objLeft < (characterX + characterWidth) &&
-                    objBottom > characterTop &&
-                    objTop < characterBottom) {
+
+                // --- Detecção de Colisão REAL (para pontuar/penalizar) ---
+                // Verifica se há sobreposição significativa para considerar a colisão
+                if (objRight > characterX + collisionOverlapThreshold &&
+                    objLeft < (characterX + characterWidth) - collisionOverlapThreshold &&
+                    objBottom > characterTop + collisionOverlapThreshold &&
+                    objTop < characterBottom - collisionOverlapThreshold) {
                     
                     if (obj.classList.contains('rola')) {
                         score += 3;
@@ -1055,6 +1093,7 @@
                     obj.remove();
                     rolas.splice(i, 1);
 
+                    // Reseta a animação da boca após um curto atraso, APENAS SE HOUVE COLISÃO
                     setTimeout(() => {
                         character.style.backgroundImage = `url(${currentCharacterMouthClosedImage})`;
                         character.classList.remove('character-eating');
