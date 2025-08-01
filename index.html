@@ -883,11 +883,17 @@
         // Event Listeners para os CARDS de seleção de personagem
         characterCards.forEach(card => {
             card.addEventListener('click', (event) => {
+                // CORREÇÃO: Verificar se é a Carlinha antes de prosseguir
+                const characterId = card.dataset.characterId;
+                if (characterId === 'carlinha') {
+                    alert('Personagem desativado por direitos autorais.');
+                    return; // Impede a seleção e o início do jogo
+                }
+
                 characterCards.forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
 
-                // CORREÇÃO: Acessar data-character-id corretamente
-                selectedCharacterId = card.dataset.characterId; 
+                selectedCharacterId = characterId; 
                 const selectedChar = characterData[selectedCharacterId];
                 
                 currentCharacterMouthClosedImage = selectedChar.closedMouthImage;
